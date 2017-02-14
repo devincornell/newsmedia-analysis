@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 import networkx as nx
 from multiprocessing import Pool
 
-parallel = False
+parallel = True
 
 flist = [
 	'Data/scraped_articles_breitbart.json',
@@ -18,6 +18,9 @@ flist = [
 
 # map function to get cofrequency given a paragraph of text
 def get_cofreq(allp):
+	tokenizer = RegexpTokenizer(r'\w+')
+	en_stop = set(stopwords.words('english'))
+
 	# tokenize paragraphs
 	pars = list()
 	for i in range(len(allp)):
@@ -40,9 +43,7 @@ def get_cofreq(allp):
 			for b in p:
 				cofreq[(a,b)] += 1
 	
-
-
-	# This will be done in the earlier...
+	# This will be done in build graph step...
 	# remove zeros and reciprocols
 	#cofreq = {k:v for k,v in cofreq.items() if v > 0}
 	#okeys = set(cofreq.keys())
@@ -55,10 +56,6 @@ def get_cofreq(allp):
 
 
 if __name__ == '__main__':
-	# set up tokenizer and stop words
-	en_stop = set(stopwords.words('english'))
-	tokenizer = RegexpTokenizer(r'\w+')
-
 	# loop through each article of each source
 	articles = list() # list of all paragraphs
 	for fname in flist:
@@ -75,7 +72,7 @@ if __name__ == '__main__':
 			pars = dat['story_content'].split('\u00a0')
 			articles.append(pars)
 
-	articles = articles[0:10]
+	articles = articles[0:100]
 
 	# map paragraph strings to cofrequency counts
 	if parallel:
