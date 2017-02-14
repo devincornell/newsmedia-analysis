@@ -3,6 +3,8 @@ import json
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 import networkx as nx
+from multiprocessing import Pool
+
 
 en_stop = set(stopwords.words('english'))
 tokenizer = RegexpTokenizer(r'\w+')
@@ -21,7 +23,8 @@ for url, dat in dat.items():
 
 	#exit()
 
-allp = allp[0:3]
+#allp = allp
+
 
 pars = []
 for i in range(len(allp)):
@@ -35,6 +38,7 @@ for i in range(len(allp)):
 	
 	tokens = tokenizer.tokenize(allp[i].lower())
 	tokens = set([i for i in tokens if not i in en_stop])
+	#print(len(tokens))
 	pars.append(tokens)
 	
 	#print('=====')
@@ -49,5 +53,8 @@ for p in pars:
 			except:
 				G.add_edge(a,b,weight=0)
 			G.edge[a][b]['weight'] += 1
+
+for e in G.edges()
+
 
 nx.write_gexf(G,'test.gexf')
