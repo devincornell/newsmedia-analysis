@@ -1,3 +1,7 @@
+
+# From Tutorial Here:
+# http://scikit-learn.org/stable/auto_examples/applications/topics_extraction_with_nmf_lda.html
+
 # Author: Olivier Grisel <olivier.grisel@ensta.org>
 #         Lars Buitinck
 #         Chyi-Kwei Yau <chyikwei.yau@gmail.com>
