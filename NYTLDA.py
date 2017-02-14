@@ -7,10 +7,12 @@ Created on Tue Feb  7 09:34:42 2017
 """
 
 from nltk.tokenize import RegexpTokenizer
-from stop_words import get_stop_words
+#from stop_words import get_stop_words
+from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
-from gensim import corpora, models 
-en_stop = get_stop_words('en')
+#from gensim import corpora, models 
+#en_stop = get_stop_words('en')
+en_stop = set(stopwords.words('english'))
 p_stemmer = PorterStemmer()
 l_stemmer = LancasterStemmer()
 
