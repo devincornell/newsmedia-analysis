@@ -1,6 +1,6 @@
 
 # server.py
-from wordtovec import WordToVec
+import gensim
 from flask import Flask
 import json
 
@@ -15,9 +15,9 @@ def hello():
 @app.route('/getword/<word>')
 def getword(word):
 
-    print('shit')
     resp = {'word':word}
-    resp['vec'] = list(wtv.get_word(word))
+    resp['vec'] = list(model[word])
+
     # show the user profile for that user
     return json.dumps(resp)
 
@@ -28,8 +28,11 @@ def getword(word):
 
 
 if __name__ == "__main__":
-    fname = "data/GoogleNews-vectors-negative300.bin.gz"
-    wtv = WordToVec(fname, testwords=500)
+    fname = "data/GoogleNews-vectors-negative300.bin"
+    #fname = "data/googlenews.bin"
+    model = gensim.models.Word2Vec.load_word2vec_format(fname, binary=True)
+
+    #wtv = WordToVec(fname, testwords=500)
     #print(wtv.df.head())
 
     print('runnin server now')
