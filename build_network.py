@@ -51,7 +51,6 @@ def get_cofreq(allp):
 	#	if (k[1],k[0]) in cofreq.keys():
 	#		cofreq[k] += cofreq[(k[1],k[0])]
 	#		del cofreq[(k[1],k[0])]
-
 	return cofreq
 
 
