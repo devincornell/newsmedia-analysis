@@ -6,7 +6,6 @@ import nltk
 def remove_specialchars(tstr):
     return tstr\
         .replace(u'\\','')\
-        .replace(u'\\n','')\
         .replace(u"'",'')\
         .replace(u'"','')
 
@@ -42,15 +41,18 @@ if __name__ == "__main__":
         articles = get_source_data(srcfile)
         src_sent = list()
         for url, art in articles.items():
-            story = art['story_content']
-            sent_tokens = nltk.sent_tokenize(str(story))
-            sent_tokens = [str(remove_specialchars(sent)) for sent in sent_tokens]
+            story = art['story_content'].decode('utf-8', errors='ignore')
+            sent_tokens = nltk.sent_tokenize(story)
+            sent_tokens = [remove_specialchars(sent) for sent in sent_tokens]
 
             src_sent = src_sent + sent_tokens
+
+        # break each sentence into a list of lower case words without the '.' character
+        src_sent = [list(map(lambda x: x.lower(),sent.replace('.','').split())) for sent in src_sent]
 
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_sent), srcname))
         print("Training model on {}".format(srcname))
-        model = gensim.models.Word2Vec(sent_tokens, size=20,workers=6)
+        model = gensim.models.Word2Vec(src_sent, size=20,workers=6)
         model.save('results/{}.wtvmodel'.format(srcname))
 
