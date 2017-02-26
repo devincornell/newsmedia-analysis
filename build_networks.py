@@ -3,9 +3,19 @@
 print('Make sure you run build_models.py before running this thing. They\'l use the models in the results/ folder.')
 
 
+import networkx as nx
 import gensim.models
-
 from os import walk
+import numpy as np
+
+# calculates relation dictionary (as edge attributes) between every word pair
+def get_relations(u_vec, v_vec):
+    rel = dict()
+
+    rel['l2_dist'] = np.linalg.norm(u_vec-v_vec)
+
+    return rel
+
 
 if __name__ == "__main__":
     model_folder_name = 'results/'
@@ -24,10 +34,21 @@ if __name__ == "__main__":
     for file in modelfiles:
         models[file.split('.')[0]] = gensim.models.Word2Vec.load(model_folder_name + file)
 
-    # look through each model
+    # look through each model to check vocab size
     for src, model in models.items():
-        modsize = len(model.vocab.keys())
-        print('{} contains {} words.'.format(src,modsize))
+        vocab = list(model.vocab.keys())
+        print('{} contains {} words.'.format(src,len(vocab)))
+        print('Building {} graph...'.format(src))
+        
+        G = nx.Graph()
+        for v in vocab:
+            G.add_node(v)
+        for u in G.nodes():
+            for v in G.nodes():
+                rel_dict = get_relations(model[u],model[v])
+                G.add_edge(u,v,rel_dict)
+
+        G.write_gexf(model_folder_name + src + '.gexf')
 
 
 
