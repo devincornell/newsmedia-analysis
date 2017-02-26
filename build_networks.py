@@ -1,6 +1,6 @@
 
 
-print('Make sure you run build_models.py before running this thing. They\'l use the models in the results/ folder.')
+print('Make sure you run build_models.py before running this thing. They\'ll use the models in the results/ folder.')
 print()
 
 import networkx as nx
@@ -88,7 +88,10 @@ if __name__ == "__main__":
 
 
         # add attributes to complete graph for analysis later
-        eig_cent = nx.eigenvector_centrality(G)
+        weights = {(u,v):1/(G.edge[u][v]['l2_dist']**2) for u in G.edge for v in G.edge[u]}
+        nx.set_edge_attributes(G,'weight', weights)
+
+        eig_cent = nx.eigenvector_centrality(G,max_iter=int(1e4),tol=1e-4,weight='weight')
         nx.set_node_attributes(G,'eig_cent', eig_cent)
 
 
