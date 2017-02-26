@@ -22,8 +22,8 @@ if __name__ == "__main__":
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
-    n = 100 # top n words to keep from each source
-    edge_cutoff = 1/3 # fraction of edges to keep in saved network
+    n = 1000 # top n words to keep from each source
+    edge_cutoff = 1/20 # fraction of edges to keep in saved network
     
     print()
 
@@ -48,49 +48,67 @@ if __name__ == "__main__":
             models[srcname]['wordfreq'] = pickle.load(f)
 
     # decide which words to use based on frequency of appearance
-    srcsets = dict()
+    candidset = set()
+    srcvocabs = list()
     for src,dat in models.items():
-        srcsets[src] = set([x[0] for x in dat['wordfreq'].most_common(n)])
+        candidset |= set([x[0] for x in dat['wordfreq'].most_common(n)])
+        srcvocabs.append(set(dat['model'].vocab.keys()))
 
-    # remove words that don't appear in top n words of all sources
-    candidset = set(reduce(lambda x: x | y, srcsets.values()))
+    # remove words that don't appear in all sources
     removeset = set()
     for w in candidset:
         removeword = False
-        for srcset in srcsets:
-            srcvocab = set(dat['model'].vocab.keys())
-            
+        for srcvocab in srcvocabs:
+            if w not in srcvocab:
+                removeword = True
         if removeword:
             removeset.add(w)
 
+    # keep only words that appear in all vocabularies
+    nodeset = candidset - removeset
+    print('Keeping {} nodes that appear in all sources.'.format(len(nodeset)))
+    print()
 
     # look through each model to check vocab size
     for src, dat in models.items():
+        print(src)
         srcvocab = set(dat['model'].vocab.keys())
         print('Building {} graph...'.format(src))
         
         G = nx.Graph()
-        for v in topnwords:
+        for v in nodeset:
             if v in srcvocab:
                 G.add_node(v,freq=dat['wordfreq'][v])
 
         for u in G.nodes():
             for v in G.nodes():
-                rel_dict = get_relations(dat['model'][u],dat['model'][v])
-                G.add_edge(u,v,rel_dict)
+                if u != v: # no self-loops
+                    rel_dict = get_relations(dat['model'][u],dat['model'][v])
+                    G.add_edge(u,v,rel_dict)
+
 
         # add attributes to complete graph for analysis later
         eig_cent = nx.eigenvector_centrality(G)
-        nx.get_node_attributes(G,'eig_cent', eig_cent)
+        nx.set_node_attributes(G,'eig_cent', eig_cent)
 
 
-        # remove weak edges
-
+        # remove weakest n edges where n = numedges*(1-edge_cutoff)
+        edges = G.edges(data=True)
+        sedges = sorted(edges,key=lambda x:x[2]['l2_dist'])
+        remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*edge_cutoff):]]
+        G.remove_edges_from(remove_edges)
+        print('{}% of edges retained: {} remain.'.format(int(len(G.edges())/len(edges)*100),len(G.edges())))
 
         # calculate new statistics on partial graph
 
 
+        # visualization parameters
+        # cytoscape uses viz_size, viz_transparency, vis_color
+        vis_color = {n:v*100 for n,v in eig_cent.items()}
+        nx.set_node_attributes(G,'viz_size', vis_color)
 
+
+        # save .gexf file
         print('Saving {}{}.gexf file'.format(results_folder,src))
         nx.write_gexf(G,results_folder + src + '.gexf')
 
