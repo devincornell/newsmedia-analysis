@@ -24,7 +24,7 @@ if __name__ == "__main__":
     wf_extension = '_wordfreq.pickle'
     n = 6000 # top n words to keep from each source
     edge_cutoff = 1/50 # fraction of edges to keep in saved network
-    maintain_nodes = 30
+    central_nodes = 30
     
     print()
 
@@ -94,6 +94,13 @@ if __name__ == "__main__":
 
         eig_cent = nx.eigenvector_centrality(G,max_iter=int(1e4),tol=1e-4,weight='weight')
         nx.set_node_attributes(G,'eig_cent', eig_cent)
+
+        # retain nodes according to most central (will keep maintain_nodes)
+        central_nodes
+        nodes = G.nodes(data=True)
+        print(nodes)
+        exit()
+        snodes = sorted(edges,key=lambda x:x)
 
 
         # remove weakest n edges where n = numedges*(1-edge_cutoff)
