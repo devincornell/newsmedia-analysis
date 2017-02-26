@@ -12,6 +12,8 @@ def remove_specialchars(tstr):
         .replace(u"'",'')\
         .replace(u'"','')\
         .replace(u'-','')\
+        .replace(u',','')\
+        
 
 def get_source_data(fname,verbose=False):
     if verbose: print('Loading data file {}.'.format(fname))
