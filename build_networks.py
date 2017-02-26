@@ -8,6 +8,7 @@ import gensim.models
 from os import walk
 import numpy as np
 import pickle
+import sys
 
 # calculates relation dictionary (as edge attributes) between every word pair
 def get_relations(u_vec, v_vec):
@@ -24,8 +25,12 @@ if __name__ == "__main__":
     wf_extension = '_wordfreq.pickle'
     n = 6000 # top n words to keep from each source
     edge_cutoff = 1/10 # fraction of edges to keep in saved network
-    central_nodes = 100 # number of most central nodes to keep
+    central_nodes = 30 # number of most central nodes to keep
     remove_all_but_central = False
+
+    if len(sys.argv) > 1:
+        results_folder = sys.argv[1]
+        print('Using results folder {}.'.format(results_folder))
 
     print()
 
@@ -118,21 +123,15 @@ if __name__ == "__main__":
 
     else:
         print('Keeping all nodes from each source.')
-
-        # remove weakest n edges where n = numedges*(1-edge_cutoff)
-        #edges = graphs[src].edges(data=True)
-        #sedges = sorted(edges,key=lambda x:x[2]['l2_dist'])
-        #remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*edge_cutoff):]]
-        #graphs[src].remove_edges_from(remove_edges)
-        #num_edges = len(graphs[src].edges())
-        #print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
-
         # calculate new statistics on partial graph
 
-        # visualization parameters
-        # cytoscape uses viz_size, viz_transparency, viz_color
-        #viz_size = {n:v*200 for n,v in eig_cent.items()}
-        #nx.set_node_attributes(graphs[src],'viz_size', viz_size)
+    # visualization parameters
+    # cytoscape uses viz_size, viz_transparency, viz_color
+    print('Applying visualization attributes.\n')
+    for src in graphs.keys():
+        eig_cent = nx.get_node_attributes(G,'eig_cent')
+        viz_size = {n:v*200 for n,v in eig_cent.items()}
+        nx.set_node_attributes(graphs[src],'viz_size', viz_size)
 
     for src in graphs.keys():
         # save .gexf file
