@@ -11,10 +11,7 @@ def remove_specialchars(tstr):
         .replace(u'\\','')\
         .replace(u"'",'')\
         .replace(u'"','')\
-        .replace(u'--','')\
-        .replace(u'\u201c','')\
-        .replace(u'\u2019','')\
-        .replace(u'\xe2\x80\x94','') # didn't work :(
+        .replace(u'-','')\
 
 def get_source_data(fname,verbose=False):
     if verbose: print('Loading data file {}.'.format(fname))
@@ -75,6 +72,7 @@ if __name__ == "__main__":
         print('{} sentences for {}.'.format(len(src_sent), srcname))
         print("Training model on {}".format(srcname))
         model = gensim.models.Word2Vec(src_sent, size=20,workers=6)
+        print('{} contains {} words.'.format(src,len(set(dat['model'].vocab.keys())))
 
         # save model and word frequency count
         print('Saving {}{}.wtvmodel and {}.pickle'.format(results_folder,srcname, srcname+'_wordfreq'))
