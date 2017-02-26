@@ -34,6 +34,7 @@ if __name__ == "__main__":
 
     # script params
     results_folder = 'results/'
+    num_dim = 100
 
     sources = {
         'breitbart': 'Data/scraped_articles_breitbart.json',
@@ -73,7 +74,7 @@ if __name__ == "__main__":
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_sent), srcname))
         print("Training model on {}".format(srcname))
-        model = gensim.models.Word2Vec(src_sent, size=20,workers=6)
+        model = gensim.models.Word2Vec(src_sent, size=num_dim,workers=6)
         print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
 
         # save model and word frequency count
