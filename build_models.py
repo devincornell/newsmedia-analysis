@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     # script params
     results_folder = 'results/'
-    num_dim = 100
+    num_dim = 50
 
     sources = {
         'breitbart': 'Data/scraped_articles_breitbart.json',
