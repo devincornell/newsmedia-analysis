@@ -25,7 +25,8 @@ if __name__ == "__main__":
     n = 6000 # top n words to keep from each source
     edge_cutoff = 1/10 # fraction of edges to keep in saved network
     central_nodes = 100 # number of most central nodes to keep
-    
+    remove_all_but_central = False
+
     print()
 
     # get model filenames
@@ -99,19 +100,24 @@ if __name__ == "__main__":
         graphs[src] = G
     print()
 
-    # get set of nodes to keep
-    keep_nodes = set()
-    for src in graphs.keys():
-        sort_nodes = sorted(graphs[src].nodes(data=True),key=lambda x:x[1]['eig_cent'])
-        keep_nodes |= set([n[0] for n in sort_nodes[-central_nodes:]])
-    
-    print('{} nodes found from all sources for comparison.'.format(len(keep_nodes)))
-    print()
+    # remove some nodes from graph
+    if remove_all_but_central:
+        # get set of nodes to keep
+        keep_nodes = set()
+        for src in graphs.keys():
+            sort_nodes = sorted(graphs[src].nodes(data=True),key=lambda x:x[1]['eig_cent'])
+            keep_nodes |= set([n[0] for n in sort_nodes[-central_nodes:]])
 
-    # remove all but most central nodes and a percentage of edges from those
-    for src in graphs.keys():
-        rm_nodes = set(graphs[src].nodes()) - keep_nodes
-        graphs[src].remove_nodes_from(rm_nodes)
+        # remove all but most central nodes
+        for src in graphs.keys():
+            rm_nodes = set(graphs[src].nodes()) - keep_nodes
+            graphs[src].remove_nodes_from(rm_nodes)
+
+        print('{} nodes found from all sources for comparison.'.format(len(keep_nodes)))
+        print()
+
+    else:
+        print('Keeping all nodes from each source.')
 
         # remove weakest n edges where n = numedges*(1-edge_cutoff)
         #edges = graphs[src].edges(data=True)
@@ -128,7 +134,7 @@ if __name__ == "__main__":
         #viz_size = {n:v*200 for n,v in eig_cent.items()}
         #nx.set_node_attributes(graphs[src],'viz_size', viz_size)
 
-
+    for src in graphs.keys():
         # save .gexf file
         print('Saving {}{}.gexf file'.format(results_folder,src))
         nx.write_gexf(graphs[src],results_folder + src + '.gexf')
