@@ -22,9 +22,9 @@ if __name__ == "__main__":
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
-    n = 100 # top n words to keep from each source
+    n = 6000 # top n words to keep from each source
     edge_cutoff = 1/10 # fraction of edges to keep in saved network
-    central_nodes = 30 # number of most central nodes to keep
+    central_nodes = 100 # number of most central nodes to keep
     
     print()
 
@@ -114,13 +114,12 @@ if __name__ == "__main__":
         graphs[src].remove_nodes_from(rm_nodes)
 
         # remove weakest n edges where n = numedges*(1-edge_cutoff)
-        print(len(graphs[src].edges()))
-        edges = graphs[src].edges(data=True)
-        sedges = sorted(edges,key=lambda x:x[2]['l2_dist'])
-        remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*edge_cutoff):]]
-        graphs[src].remove_edges_from(remove_edges)
-        num_edges = len(graphs[src].edges())
-        print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
+        #edges = graphs[src].edges(data=True)
+        #sedges = sorted(edges,key=lambda x:x[2]['l2_dist'])
+        #remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*edge_cutoff):]]
+        #graphs[src].remove_edges_from(remove_edges)
+        #num_edges = len(graphs[src].edges())
+        #print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
 
         # calculate new statistics on partial graph
 
