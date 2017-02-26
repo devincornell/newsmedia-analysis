@@ -22,9 +22,9 @@ if __name__ == "__main__":
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
-    n = 6000 # top n words to keep from each source
-    edge_cutoff = 1/50 # fraction of edges to keep in saved network
-    central_nodes = 30
+    n = 100 # top n words to keep from each source
+    edge_cutoff = 1/10 # fraction of edges to keep in saved network
+    central_nodes = 30 # number of most central nodes to keep
     
     print()
 
@@ -71,6 +71,7 @@ if __name__ == "__main__":
     print()
 
     # look through each model to check vocab size
+    graphs = dict()
     for src, dat in models.items():
         print(src)
         srcvocab = set(dat['model'].vocab.keys())
@@ -95,33 +96,43 @@ if __name__ == "__main__":
         eig_cent = nx.eigenvector_centrality(G,max_iter=int(1e4),tol=1e-4,weight='weight')
         nx.set_node_attributes(G,'eig_cent', eig_cent)
 
-        # retain nodes according to most central (will keep maintain_nodes)
-        central_nodes
-        nodes = G.nodes(data=True)
-        print(nodes)
-        exit()
-        snodes = sorted(edges,key=lambda x:x)
+        graphs[src] = G
+    print()
 
+    # get set of nodes to keep
+    keep_nodes = set()
+    for src in graphs.keys():
+        sort_nodes = sorted(graphs[src].nodes(data=True),key=lambda x:x[1]['eig_cent'])
+        keep_nodes |= set([n[0] for n in sort_nodes[-central_nodes:]])
+    
+    print('{} nodes found from all sources for comparison.'.format(len(keep_nodes)))
+    print()
+
+    # remove all but most central nodes and a percentage of edges from those
+    for src in graphs.keys():
+        rm_nodes = set(graphs[src].nodes()) - keep_nodes
+        graphs[src].remove_nodes_from(rm_nodes)
 
         # remove weakest n edges where n = numedges*(1-edge_cutoff)
-        edges = G.edges(data=True)
+        print(len(graphs[src].edges()))
+        edges = graphs[src].edges(data=True)
         sedges = sorted(edges,key=lambda x:x[2]['l2_dist'])
         remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*edge_cutoff):]]
-        G.remove_edges_from(remove_edges)
-        print('{}% of edges retained: {} remain.'.format(int(len(G.edges())/len(edges)*100),len(G.edges())))
+        graphs[src].remove_edges_from(remove_edges)
+        num_edges = len(graphs[src].edges())
+        print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
 
         # calculate new statistics on partial graph
 
-
         # visualization parameters
-        # cytoscape uses viz_size, viz_transparency, vis_color
-        vis_color = {n:v*200 for n,v in eig_cent.items()}
-        nx.set_node_attributes(G,'viz_size', vis_color)
+        # cytoscape uses viz_size, viz_transparency, viz_color
+        #viz_size = {n:v*200 for n,v in eig_cent.items()}
+        #nx.set_node_attributes(graphs[src],'viz_size', viz_size)
 
 
         # save .gexf file
         print('Saving {}{}.gexf file'.format(results_folder,src))
-        nx.write_gexf(G,results_folder + src + '.gexf')
+        nx.write_gexf(graphs[src],results_folder + src + '.gexf')
 
         print()
 
