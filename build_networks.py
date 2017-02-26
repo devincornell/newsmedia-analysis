@@ -48,6 +48,7 @@ if __name__ == "__main__":
                 rel_dict = get_relations(model[u],model[v])
                 G.add_edge(u,v,rel_dict)
 
+        print('Saving {}{}.gexf file'.format(model_folder_name,src))
         G.write_gexf(model_folder_name + src + '.gexf')
 
 
