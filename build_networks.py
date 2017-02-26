@@ -23,7 +23,15 @@ if __name__ == "__main__":
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
     n = 1000 # top n words to keep from each source
-    edge_cutoff = 1/20 # fraction of edges to keep in saved network
+    edge_cutoff = 1/50 # fraction of edges to keep in saved network
+    special_nodes = [
+        'trump',
+        'hillary',
+        'brexit',
+        'terrorism',
+        'islam',
+        'islamic',
+        ]
     
     print()
 
@@ -99,6 +107,7 @@ if __name__ == "__main__":
         edges = G.edges(data=True)
         sedges = sorted(edges,key=lambda x:x[2]['l2_dist'])
         remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*edge_cutoff):]]
+        remove_edges = list(filter(lambda x: x[0] not in special_nodes and x[1] not in special_nodes,remove_edges))
         G.remove_edges_from(remove_edges)
         print('{}% of edges retained: {} remain.'.format(int(len(G.edges())/len(edges)*100),len(G.edges())))
 
@@ -107,7 +116,7 @@ if __name__ == "__main__":
 
         # visualization parameters
         # cytoscape uses viz_size, viz_transparency, vis_color
-        vis_color = {n:v*100 for n,v in eig_cent.items()}
+        vis_color = {n:v*200 for n,v in eig_cent.items()}
         nx.set_node_attributes(G,'viz_size', vis_color)
 
 
