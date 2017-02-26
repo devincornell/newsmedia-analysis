@@ -2,6 +2,7 @@
 import gensim.models
 import json
 import nltk
+import nltk.corpus
 
 def remove_specialchars(tstr):
     return tstr\
@@ -36,7 +37,8 @@ if __name__ == "__main__":
         'foxnews': 'Data/scraped_articles_foxnews.json',
         'nytimes': 'Data/scraped_articles_nytimes.json',
         }
-
+    
+    stopwords = nltk.corpus.stopwords.words('english')
     for srcname, srcfile in sources.items():
         articles = get_source_data(srcfile)
         src_sent = list()
@@ -50,6 +52,9 @@ if __name__ == "__main__":
         # break each sentence into a list of lower case words without the '.' character
         src_sent = [list(map(lambda x: x.lower(),sent.replace('.','').split())) for sent in src_sent]
 
+        # remove stopwords from sentences
+        src_sent = [list(filter(lambda x: x not in stopwords, sent)) for sent in src_sent]
+        
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_sent), srcname))
         print("Training model on {}".format(srcname))
