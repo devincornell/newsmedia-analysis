@@ -3,6 +3,7 @@ import gensim.models
 import json
 import nltk
 import nltk.corpus
+from nltk.stem.wordnet import WordNetLemmatizer
 
 def remove_specialchars(tstr):
     return tstr\
@@ -54,7 +55,11 @@ if __name__ == "__main__":
 
         # remove stopwords from sentences
         src_sent = [list(filter(lambda x: x not in stopwords, sent)) for sent in src_sent]
-        
+
+        # lemmatize words
+        lmtzr = WordNetLemmatizer()
+        src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
+
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_sent), srcname))
         print("Training model on {}".format(srcname))
