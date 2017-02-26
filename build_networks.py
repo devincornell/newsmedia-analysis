@@ -23,7 +23,10 @@ if __name__ == "__main__":
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
     n = 100 # top n words to keep from each source
+    edge_cutoff = 1/3 # fraction of edges to keep in saved network
     
+    print()
+
     # get model filenames
     modelfiles = list()
     for (dirpath, dirnames, filenames) in walk(results_folder):
@@ -44,12 +47,22 @@ if __name__ == "__main__":
         with open(results_folder + srcname + wf_extension, 'rb') as f:
             models[srcname]['wordfreq'] = pickle.load(f)
 
-    # decide which words to use based on frequency of appearance in all documents
-    topnwords = set()
+    # decide which words to use based on frequency of appearance
+    srcsets = dict()
     for src,dat in models.items():
-        candidates = set([x[0] for x in dat['wordfreq'].most_common(n)])
-        # remove candidates that aren't in all vocabs?
-        topnwords |= candidates
+        srcsets[src] = set([x[0] for x in dat['wordfreq'].most_common(n)])
+
+    # remove words that don't appear in top n words of all sources
+    candidset = set(reduce(lambda x: x | y, srcsets.values()))
+    removeset = set()
+    for w in candidset:
+        removeword = False
+        for srcset in srcsets:
+            srcvocab = set(dat['model'].vocab.keys())
+            
+        if removeword:
+            removeset.add(w)
+
 
     # look through each model to check vocab size
     for src, dat in models.items():
@@ -65,6 +78,18 @@ if __name__ == "__main__":
             for v in G.nodes():
                 rel_dict = get_relations(dat['model'][u],dat['model'][v])
                 G.add_edge(u,v,rel_dict)
+
+        # add attributes to complete graph for analysis later
+        eig_cent = nx.eigenvector_centrality(G)
+        nx.get_node_attributes(G,'eig_cent', eig_cent)
+
+
+        # remove weak edges
+
+
+        # calculate new statistics on partial graph
+
+
 
         print('Saving {}{}.gexf file'.format(results_folder,src))
         nx.write_gexf(G,results_folder + src + '.gexf')
