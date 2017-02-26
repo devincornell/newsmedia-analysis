@@ -26,10 +26,8 @@ if __name__ == "__main__":
 
     # look through each model
     for src, model in models.items():
-        print(list(model.vocab.keys())[0:10])
-        #for v in model.vocab:
-        #    print(v)
-        #print(model.vocab)
+        modsize = len(model.vocab.keys())
+        print('{} contains {} words.'.format(src,modsize))
 
 
 

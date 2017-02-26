@@ -56,7 +56,7 @@ if __name__ == "__main__":
         # remove stopwords from sentences
         src_sent = [list(filter(lambda x: x not in stopwords, sent)) for sent in src_sent]
 
-        # lemmatize words
+        # lemmatize words using wordnet corpus
         lmtzr = WordNetLemmatizer()
         src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
 
