@@ -21,7 +21,11 @@ Full descriptions of each can be found below. You might try running them with cu
 Then word frequencies are taken using nltk.FreqDist(), and a word2vec projection is generated using gensim.models.Word2Vec(). The output files are {srcname}.wtvmodel for the gensim word2vec models and {srcname}_wordfreq.pickle for the nltk FreqDist files. These files are expected to be consumed by build_networks.py
 
 =====
-2. build_networks.py: This script consumes the .wtvmodel and _wordfreq.pickle files in the results/ folder to build relational networks. The intent is to produce networks managable in size so that they can be viewed.
+2. build_networks.py: This script consumes the .wtvmodel and _wordfreq.pickle files in the results/ folder to build relational networks. The intent is to produce networks managable in size so that they can be viewed. Its pipeline contains the following steps:
+
+    a) open each model and word frequency count
+    b) calculate the n most frequenly used words
+
 
 
 
