@@ -73,7 +73,7 @@ def sparsify_graphfile(fname):
     edata = [((u,v),G.edge[u][v]['weight'],degrees[u],degrees[v],T) for u in G.edge for v in G.edge[u]]
     
     print('Starting sparsification..')
-    p = Pool(10) # will never use that many
+    p = Pool(30) # will never use that many
     pvals = p.map(pvalf,edata)
     print('Sparsification finished.')
 
@@ -90,7 +90,7 @@ def sparsify_graphfile(fname):
     print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))        
     
     ofname = src + '_sparse.gexf'
-    print('Writing file {}'.format(ofname))
+    print('Writing file {}\n'.format(ofname))
     nx.write_gexf(G,ofname)
     return ofname
 
