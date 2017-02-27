@@ -23,10 +23,10 @@ if __name__ == "__main__":
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
-    n = 6000 # top n words to keep from each source
-    edge_cutoff = 1/10 # fraction of edges to keep in saved network
-    central_nodes = 30 # number of most central nodes to keep
+    n = 1000 # top n words to keep from each source
     remove_all_but_central = False
+    central_nodes = 30 # number of most central nodes to keep
+
 
     if len(sys.argv) > 1:
         results_folder = sys.argv[1]
@@ -127,11 +127,11 @@ if __name__ == "__main__":
 
     # visualization parameters
     # cytoscape uses viz_size, viz_transparency, viz_color
-    print('Applying visualization attributes.\n')
-    for src in graphs.keys():
-        eig_cent = nx.get_node_attributes(G,'eig_cent')
-        viz_size = {n:v*200 for n,v in eig_cent.items()}
-        nx.set_node_attributes(graphs[src],'viz_size', viz_size)
+    #print('Applying visualization attributes.\n')
+    #for src in graphs.keys():
+    #    eig_cent = nx.get_node_attributes(G,'eig_cent')
+    #    viz_size = {n:v*200 for n,v in eig_cent.items()}
+    #    nx.set_node_attributes(graphs[src],'viz_size', viz_size)
 
     for src in graphs.keys():
         # save .gexf file
