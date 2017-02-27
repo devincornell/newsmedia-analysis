@@ -8,12 +8,12 @@ import sys
 import functools
 from multiprocessing import Pool
 
-def get_files(folder, extension):
+def get_files(folder, extension, rejection):
     # get model filenames
     modelfiles = list()
     for (dirpath, dirnames, filenames) in walk(folder):
         for file in filenames:
-            if file[-len(extension):] == extension:
+            if file[-len(extension):] == extension and file[-len(rejection):] != rejection:
                 modelfiles.append(folder + file)
     return modelfiles
 
@@ -98,13 +98,16 @@ def sparsify_graphfile(fname):
 if __name__ == '__main__':
     keep_fraction = 0.01 # fraction of edges to keep
 
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1:   
         results_folder = sys.argv[1]
     else:
         results_folder = 'results/'
     
-    graphfiles = get_files(sys.argv[1], '.gexf')
+    graphfiles = get_files(results_folder, '.gexf', '_sparse.gexf')
 
+    print(graphfiles)
+    print()
+    
     #p = Pool(len(graphfiles))
     print(list(map(sparsify_graphfile, graphfiles)))
 

@@ -27,5 +27,14 @@ Then word frequencies are taken using nltk.FreqDist(), and a word2vec projection
     b) calculate the n most frequenly used words
 
 
+==== TODO ===== 
+
+build_models.py:
+
+	a) set to use new source
+
+sparsify_networks.py:
+
+	a) move into module
 
 
