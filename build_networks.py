@@ -13,8 +13,8 @@ import sys
 # calculates relation dictionary (as edge attributes) between every word pair
 def get_relations(u_vec, v_vec):
     rel = dict()
-    u_vec = u_vec/np.linalg.norm(u_vec)
-    v_vec = v_vec/np.linalg.norm(v_vec)
+    uvec = uvec/np.linalg.norm(u_vec)
+    vvec = vvec/np.linalg.norm(v_vec)
     rel['l2_dist'] = float(np.linalg.norm(u_vec-v_vec))
 
     return rel
@@ -27,6 +27,8 @@ if __name__ == "__main__":
     n = 1000 # top n words to keep from each source
     remove_all_but_central = False
     central_nodes = 30 # number of most central nodes to keep
+    remove_weakest_edges = True
+    edge_retain_ratio = 0.5
 
 
     if len(sys.argv) > 1:
@@ -126,6 +128,20 @@ if __name__ == "__main__":
         print('Keeping all nodes from each source.')
         # calculate new statistics on partial graph
 
+
+    if edge_retain_ratio:
+        # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
+        print('Removing weak edges..')
+        edges = G.edges(data=True)
+        sedges = sorted(edges,key=lambda x:x[2]['weight'])
+        keep_num = int(len(edges)*edge_retain_ratio)
+        remove_edges = [(x[0],x[1]) for x in sedges[-keep_num:]]
+        G.remove_edges_from(remove_edges)
+        num_edges = len(G.edges())
+        print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
+    else:
+        print('Retaining al edges.')
+
     # visualization parameters
     # cytoscape uses viz_size, viz_transparency, viz_color
     #print('Applying visualization attributes.\n')
@@ -140,3 +156,7 @@ if __name__ == "__main__":
         nx.write_gexf(graphs[src],results_folder + src + '.gexf')
 
         print()
+
+
+
+
