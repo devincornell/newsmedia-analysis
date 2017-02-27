@@ -96,7 +96,7 @@ def sparsify_graphfile(fname):
 
 
 if __name__ == '__main__':
-    keep_fraction = 0.01 # fraction of edges to keep
+    keep_fraction = 0.1 # fraction of edges to keep
 
     if len(sys.argv) > 1:   
         results_folder = sys.argv[1]
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     print(graphfiles)
     print()
-    
+
     #p = Pool(len(graphfiles))
     print(list(map(sparsify_graphfile, graphfiles)))
 
