@@ -56,7 +56,12 @@ if __name__ == "__main__":
             src_sent = src_sent + sent_tokens
 
         # break each sentence into a list of lower case words without the '.' character
-        src_sent = [list(map(lambda x: x.lower(),sent.replace('.','').split())) for sent in src_sent]
+        src_sent = [list(map(lambda x: x.lower(),sent.split())) for sent in src_sent]
+
+        # remove a period at the end of every sentence
+        for i in range(len(src_sent)):
+        	if len(src_sent[i]) > 0 and len(src_sent[i][-1]) > 0 and src_sent[i][-1][-1] == '.':
+        		src_sent[i][-1] = src_sent[i][-1][:-1]
 
         # apply ascii encodings (by ommitting non-ascii chars)
         src_sent = [list(map(lambda x: x.encode('ascii',errors='ignore').decode(), sent)) for sent in src_sent]
