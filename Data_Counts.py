@@ -1,5 +1,11 @@
 import json
 import string
+from IPython import display
+
+newdata = {}
+with open ('/Users/jacobfisher/PycharmProjects/newsmedia-analysis/Data/postprocessed_data.json', 'r') as infile:
+    for k,v in json.load(infile).items():
+        newdata[k] = v
 
 sourcenames = ['nytimes','breitbart','foxnews','washingtonpost','cnn','cbsnews']
 data = {}
@@ -48,7 +54,7 @@ for ch in string.punctuation:
 
 print("There are in total", len(strdata.split()), "words in the dataset")
 
-print("In total there are", len(data), "articles")
+print("In total there are", len(newdata), "articles")
 print("There are", len(nytdata), "articles from the NYT")
 print("There are", len(breitdata), "articles from Breitbart")
 print("There are", len(wapodata), "articles from WaPo")
