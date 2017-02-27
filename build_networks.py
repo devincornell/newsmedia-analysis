@@ -140,7 +140,7 @@ if __name__ == "__main__":
         num_edges = len(G.edges())
         print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
     else:
-        print('Retaining al edges.')
+        print('Retaining all edges.')
 
     # visualization parameters
     # cytoscape uses viz_size, viz_transparency, viz_color
