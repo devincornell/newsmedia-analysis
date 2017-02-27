@@ -13,7 +13,8 @@ import sys
 # calculates relation dictionary (as edge attributes) between every word pair
 def get_relations(u_vec, v_vec):
     rel = dict()
-
+    uvec = uvec/np.linalg.norm(u_vec)
+    vvec = vvec/np.linalg.norm(v_vec)
     rel['l2_dist'] = float(np.linalg.norm(u_vec-v_vec))
 
     return rel
