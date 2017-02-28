@@ -24,8 +24,8 @@ if __name__ == "__main__":
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
-    n = 1500 # top n words to keep from each source
-    remove_all_but_central = False
+    n = 500 # top n words to keep from each source
+    remove_all_but_central = True
     central_nodes = 30 # number of most central nodes to keep
     remove_weakest_edges = True
     edge_retain_ratio = 0.3
@@ -129,6 +129,14 @@ if __name__ == "__main__":
         # calculate new statistics on partial graph
 
     for src in graphs.keys():
+        # save .gexf file
+        print('Saving {}{}.gexf file'.format(results_folder, src))
+        nx.write_gexf(graphs[src], results_folder + src + '.gexf')
+
+        print()
+
+    #creatin n' savin' sparsified graphs
+    for src in graphs.keys():
         if edge_retain_ratio:
             # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
             print('Removing weak edges..')
@@ -139,24 +147,17 @@ if __name__ == "__main__":
             G.remove_edges_from(remove_edges)
             num_edges = len(G.edges())
             print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
+            ofname = src + '_sparse.gexf'
+            print('Writing file {}\n'.format(ofname))
+            nx.write_gexf(G, ofname)
+
         else:
             print('Retaining all edges.')
 
     # visualization parameters
     # cytoscape uses viz_size, viz_transparency, viz_color
-    #print('Applying visualization attributes.\n')
-    #for src in graphs.keys():
-    #    eig_cent = nx.get_node_attributes(G,'eig_cent')
-    #    viz_size = {n:v*200 for n,v in eig_cent.items()}
-    #    nx.set_node_attributes(graphs[src],'viz_size', viz_size)
-
-    for src in graphs.keys():
-        # save .gexf file
-        print('Saving {}{}.gexf file'.format(results_folder,src))
-        nx.write_gexf(graphs[src],results_folder + src + '.gexf')
-
-        print()
-#
-
-
-
+    # print('Applying visualization attributes.\n')
+    # for src in graphs.keys():
+    # eig_cent = nx.get_node_attributes(G,'eig_cent')
+    # viz_size = {n:v*200 for n,v in eig_cent.items()}
+    # nx.set_node_attributes(graphs[src],'viz_size', viz_size)
