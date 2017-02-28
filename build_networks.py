@@ -28,7 +28,7 @@ if __name__ == "__main__":
     remove_all_but_central = False
     central_nodes = 30 # number of most central nodes to keep
     remove_weakest_edges = True
-    edge_retain_ratio = 0.7
+    edge_retain_ratio = 0.3
 
 
     if len(sys.argv) > 1:
