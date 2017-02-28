@@ -24,11 +24,11 @@ if __name__ == "__main__":
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
-    n = 1000 # top n words to keep from each source
+    n = 1500 # top n words to keep from each source
     remove_all_but_central = False
     central_nodes = 30 # number of most central nodes to keep
     remove_weakest_edges = True
-    edge_retain_ratio = 0.5
+    edge_retain_ratio = 0.7
 
 
     if len(sys.argv) > 1:
