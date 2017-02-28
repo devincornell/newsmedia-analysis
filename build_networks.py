@@ -128,19 +128,19 @@ if __name__ == "__main__":
         print('Keeping all nodes from each source.')
         # calculate new statistics on partial graph
 
-
-    if edge_retain_ratio:
-        # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
-        print('Removing weak edges..')
-        edges = G.edges(data=True)
-        sedges = sorted(edges,key=lambda x:x[2]['weight'])
-        keep_num = int(len(edges)*edge_retain_ratio)
-        remove_edges = [(x[0],x[1]) for x in sedges[-keep_num:]]
-        G.remove_edges_from(remove_edges)
-        num_edges = len(G.edges())
-        print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
-    else:
-        print('Retaining all edges.')
+    for src in graphs.keys():
+        if edge_retain_ratio:
+            # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
+            print('Removing weak edges..')
+            edges = G.edges(data=True)
+            sedges = sorted(edges,key=lambda x:x[2]['weight'])
+            keep_num = int(len(edges)*edge_retain_ratio)
+            remove_edges = [(x[0],x[1]) for x in sedges[-keep_num:]]
+            G.remove_edges_from(remove_edges)
+            num_edges = len(G.edges())
+            print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
+        else:
+            print('Retaining all edges.')
 
     # visualization parameters
     # cytoscape uses viz_size, viz_transparency, viz_color
