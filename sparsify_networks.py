@@ -84,7 +84,7 @@ def sparsify_graphfile(fname):
     print('Removing crappy edges..')
     edges = G.edges(data=True)
     sedges = sorted(edges,key=lambda x:x[2]['pval'])
-    remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*keep_fraction):]]
+    remove_edges = [(x[0],x[1]) for x in sedges[-int(len(edges)*keep_fraction):]]
     G.remove_edges_from(remove_edges)
     num_edges = len(G.edges())
     print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))        
