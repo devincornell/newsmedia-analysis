@@ -80,6 +80,7 @@ if __name__ == "__main__":
         src_sent = map(nltk.pos_tag, src_sent)
         print(src_sent[:10])
 
+
         # # lemmatize words using wordnet corpus
         # lmtzr = WordNetLemmatizer()
         # src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
