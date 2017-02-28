@@ -43,6 +43,10 @@ if __name__ == "__main__":
         'foxnews': 'Data/scraped_articles_foxnews.json',
         'nytimes': 'Data/scraped_articles_nytimes.json',
         'wapo': 'Data/scraped_articles_washingtonpost.json',
+        'huffpo': 'Data/scraped_articles_huffingtonpost.json',
+        'reuters': 'Data/scraped_articles_reuters.json',
+        'usatoday': 'Data/scraped_articles_usatoday.json',
+        'watimes': 'Data/scraped_articles_washingtontimes.json',
         }
     
     stopwords = nltk.corpus.stopwords.words('english')
