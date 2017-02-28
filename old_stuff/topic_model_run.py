@@ -1,6 +1,7 @@
 # coding: utf-8
-from topic_model import *
 import json
+
+from old_stuff.topic_model import *
 
 data = {}
 with open('/Users/jacobfisher/PycharmProjects/newsmedia-analysis/Data/postprocessed_data.json', 'r') as infile:
