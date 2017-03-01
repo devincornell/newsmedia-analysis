@@ -76,10 +76,17 @@ if __name__ == "__main__":
         # remove stopwords from sentences
         src_sent = [list(filter(lambda x: x not in stopwords, sent)) for sent in src_sent]
 
-        # remove words that aren't nouns
-        src_sent = map(nltk.pos_tag, src_sent)
-        print(src_sent[:10])
+        # POS Tagging
+        src_sent = [nltk.pos_tag(x) for x in src_sent]
 
+        #remove nouns
+        # src_sent_nouns = []
+        # for sent in src_sent:
+        #     for word in sent:
+        #         nouns = [filter(lambda x: x[1] == "NN", src_sent)]
+        #         #src_sent_nouns.append(nouns)
+
+        #print(src_sent_nouns[:10])
 
         # # lemmatize words using wordnet corpus
         # lmtzr = WordNetLemmatizer()
