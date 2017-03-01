@@ -79,14 +79,18 @@ if __name__ == "__main__":
         # POS Tagging
         src_sent = [nltk.pos_tag(x) for x in src_sent]
 
-        #remove nouns
-        # src_sent_nouns = []
-        # for sent in src_sent:
-        #     for word in sent:
-        #         nouns = [filter(lambda x: x[1] == "NN", src_sent)]
-        #         #src_sent_nouns.append(nouns)
+        src_nouns = []
+        for sent in src_sent:
+            n = [x for x in sent if x[-1] == 'NN']
+            src_nouns.append(n)
 
-        #print(src_sent_nouns[:10])
+        src_nouns_2 = []
+        for sent in src_nouns:
+            n = [x[0] for x in sent]
+            src_nouns_2.append(n)
+
+        src_sent = src_nouns_2
+        print(src_sent[:10])
 
         # # lemmatize words using wordnet corpus
         # lmtzr = WordNetLemmatizer()
