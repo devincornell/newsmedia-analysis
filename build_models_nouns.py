@@ -108,7 +108,7 @@ if __name__ == "__main__":
             if sent is None or sent == [] or sent == ():
                 continue
             else:
-                src_nouns += ([list(filter(lambda x: x[-1] == 'NN', sent))])
+                src_nouns.append(([list(filter(lambda x: x[-1] == 'NN', sent))]))
 
         ptprint.pprint(src_nouns[:100])
 
