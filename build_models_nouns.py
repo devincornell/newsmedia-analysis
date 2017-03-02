@@ -6,7 +6,11 @@ import nltk
 import nltk.corpus
 from nltk.stem.wordnet import WordNetLemmatizer
 import pickle
+import matplotlib.pyplot as pp
+import pprint
 
+pp.style.use('ggplot')
+ptprint = (pprint.PrettyPrinter(indent=3))
 
 def remove_specialchars(tstr):
     return tstr\
@@ -63,6 +67,7 @@ if __name__ == "__main__":
             src_sent = src_sent + sent_tokens
 
         # break each sentence into a list of lower case words without the '.' character
+        print("Making lists of lowercase words")
         src_sent = [list(map(lambda x: x.lower(),sent.split())) for sent in src_sent]
 
         # remove a period at the end of every sentence
@@ -74,37 +79,73 @@ if __name__ == "__main__":
         src_sent = [list(map(lambda x: x.encode('ascii',errors='ignore').decode(), sent)) for sent in src_sent]
 
         # remove stopwords from sentences
+        print("Removing stopwords")
         src_sent = [list(filter(lambda x: x not in stopwords, sent)) for sent in src_sent]
 
+        print(src_sent[:10])
+
         # POS Tagging
-        src_sent = [nltk.pos_tag(x) for x in src_sent]
+        print("Tagging parts of speech")
+        src_sent_tagged = []
+        for sent in src_sent[:10]:
+            if sent is None or sent == [] or sent == ():
+                src_sent.remove(sent)
+                continue
+            else:
+                try:
+                    n = nltk.pos_tag(sent)
+                    src_sent_tagged.append(n)
+                except IndexError:
+                    continue
+
+        print(src_sent_tagged[:10])
 
         #create list of nouns
+        print("Creating a list of nouns")
+
         src_nouns = []
-        for sent in src_sent:
-            n = [x for x in sent if x[-1] == 'NN']
-            src_nouns.append(n)
+        for sent in src_sent_tagged:
+            if sent is None or sent == [] or sent == ():
+                continue
+            else:
+                src_nouns += ([list(filter(lambda x: x[-1] == 'NN', sent))])
+
+        ptprint.pprint(src_nouns[:100])
 
         #get rid of the "NN"s from the list
+        print("Removing everything but nouns")
         src_nouns_2 = []
         for sent in src_nouns:
-            n = [x[0] for x in sent]
-            src_nouns_2.append(n)
+            if sent is None or sent == [] or sent == ():
+                continue
+            else:
+                for sent in src_nouns:
+                    n = [x[0] for x in sent]
+                    src_nouns_2.append(n)
 
-        src_sent = src_nouns_2
-        #print(src_sent[:10])
+        src_nouns = src_nouns_2
+        ptprint.pprint(src_nouns)
 
-        # # lemmatize words using wordnet corpus
-        # lmtzr = WordNetLemmatizer()
-        # src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
+        # #create a giant string of all of the nouns (for use later)
+        # nounstring = ' '.join(str(word) for sent in src_nouns for word in sent)
+        # nounstring.replace('?', '')
+        # nounstring.replace('.', '')
+        # nounstring.replace('it?', '')
+        #
+        # print(nounstring)
+        #
+        # # # lemmatize words using wordnet corpus
+        # # lmtzr = WordNetLemmatizer()
+        # # src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
+        #
         #
         # # calculate frequency information for each word
-        # freq_dist = nltk.FreqDist([w for s in src_sent for w in s])
-        #
+        # freq_dist = nltk.FreqDist([w for s in src_nouns for w in s])
+
         # # train model on all sentences from source
-        # print('{} sentences for {}.'.format(len(src_sent), srcname))
+        # print('{} sentences for {}.'.format(len(src_nouns), srcname))
         # print("Training model on {}".format(srcname))
-        # model = gensim.models.Word2Vec(src_sent, size=num_dim,workers=6)
+        # model = gensim.models.Word2Vec(src_nouns, size=num_dim,workers=6)
         # print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
         #
         # # save model and word frequency count

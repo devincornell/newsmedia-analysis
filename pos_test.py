@@ -19,6 +19,10 @@ for sent in src_nouns:
 
 print(src_nouns_2)
 
+stringnouns = ' '.join(str(word) for sent in src_nouns_2 for word in sent)
+
+print(stringnouns)
+
 # src_sent_nouns = []
 # for sent in src_sents:
 #     nouns = [filter(lambda x: x[1] == "NN", src_sent)]
