@@ -8,6 +8,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 import pickle
 import matplotlib.pyplot as pp
 import pprint
+import re
 
 pp.style.use('ggplot')
 ptprint = (pprint.PrettyPrinter(indent=3))
@@ -44,15 +45,15 @@ if __name__ == "__main__":
 
     sources = {
         'breitbart': 'Data/scraped_articles_breitbart.json',
-        # 'cbsnews': 'Data/scraped_articles_cbsnews.json',
-        # 'cnn': 'Data/scraped_articles_cnn.json',
-        # 'foxnews': 'Data/scraped_articles_foxnews.json',
-        # 'nytimes': 'Data/scraped_articles_nytimes.json',
-        # 'wapo': 'Data/scraped_articles_washingtonpost.json',
-        # 'huffpo': 'Data/scraped_articles_huffingtonpost.json',
-        # 'reuters': 'Data/scraped_articles_reuters.json',
-        # 'usatoday': 'Data/scraped_articles_usatoday.json',
-        # 'watimes': 'Data/scraped_articles_washingtontimes.json',
+        'cbsnews': 'Data/scraped_articles_cbsnews.json',
+        'cnn': 'Data/scraped_articles_cnn.json',
+        'foxnews': 'Data/scraped_articles_foxnews.json',
+        'nytimes': 'Data/scraped_articles_nytimes.json',
+        'wapo': 'Data/scraped_articles_washingtonpost.json',
+        'huffpo': 'Data/scraped_articles_huffingtonpost.json',
+        'reuters': 'Data/scraped_articles_reuters.json',
+        'usatoday': 'Data/scraped_articles_usatoday.json',
+        'watimes': 'Data/scraped_articles_washingtontimes.json',
         }
 
     stopwords = nltk.corpus.stopwords.words('english')
@@ -86,10 +87,13 @@ if __name__ == "__main__":
 
         # POS Tagging
         print("Tagging parts of speech")
+
         src_sent_tagged = []
-        for sent in src_sent[:10]:
+
+        src_sent = [sent for sent in src_sent if sent]
+
+        for sent in src_sent:
             if sent is None or sent == [] or sent == ():
-                src_sent.remove(sent)
                 continue
             else:
                 try:
@@ -98,62 +102,49 @@ if __name__ == "__main__":
                 except IndexError:
                     continue
 
+        src_sent_tagged = [sent for sent in src_sent_tagged if sent]
+
         print(src_sent_tagged[:10])
 
         #create list of nouns
         print("Creating a list of nouns")
 
-        src_nouns = []
-        for sent in src_sent_tagged:
-            if sent is None or sent == [] or sent == ():
-                src_sent_tagged.remove(sent)
-                continue
-            else:
-                n = [x for x in sent if x[-1] == 'NN']
-                src_nouns.append(n)
+        src_nouns = [[n for n in sent if n and n[-1] == 'NN'] for sent in src_sent_tagged]
 
-        print(src_nouns[:100])
+        print(src_nouns[:10])
 
         #get rid of the "NN"s from the list
         print("Removing everything but nouns")
-        src_nouns_2 = []
-        for sent in src_nouns:
-            if sent is None or sent == [] or sent == ():
-                continue
-            else:
-                for sent in src_nouns:
-                    n = [x[0] for x in sent]
-                    src_nouns_2.append(n)
+
+        src_nouns_2 = [[n[0] for n in sent] for sent in src_nouns]
 
         src_nouns = src_nouns_2
         print(src_nouns)
 
-        # #create a giant string of all of the nouns (for use later)
-        # nounstring = ' '.join(str(word) for sent in src_nouns for word in sent)
-        # nounstring.replace('?', '')
-        # nounstring.replace('.', '')
-        # nounstring.replace('it?', '')
-        #
-        # print(nounstring)
-        #
-        # # # lemmatize words using wordnet corpus
-        # # lmtzr = WordNetLemmatizer()
-        # # src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
-        #
-        #
-        # # calculate frequency information for each word
-        # freq_dist = nltk.FreqDist([w for s in src_nouns for w in s])
+        #create a giant string of all of the nouns (for use later)
+        print("Creating a string of all nouns in corpus")
+        nounstring = ' '.join(str(word) for sent in src_nouns for word in sent)
+        import re
+        text = re.sub(r'^http?:\/\/.*[\r\n]*', '', nounstring)
 
-        # # train model on all sentences from source
-        # print('{} sentences for {}.'.format(len(src_nouns), srcname))
-        # print("Training model on {}".format(srcname))
-        # model = gensim.models.Word2Vec(src_nouns, size=num_dim,workers=6)
-        # print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
-        #
-        # # save model and word frequency count
-        # print('Saving {}.wtvmodel and {}_wordfreq.pickle'.format(srcname, srcname))
-        # model.save('{}{}.wtvmodel'.format(results_folder,srcname))
-        # with open(results_folder + srcname + '_wordfreq.pickle','wb') as f:
-        #     pickle.dump(freq_dist, f)
-        # print()
+        # # lemmatize words using wordnet corpus
+        # lmtzr = WordNetLemmatizer()
+        # src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
+
+        # calculate frequency information for each word
+        freq_dist = nltk.FreqDist([w for s in src_nouns for w in s])
+
+
+        # train model on all sentences from source
+        print('{} sentences for {}.'.format(len(src_nouns), srcname))
+        print("Training model on {}".format(srcname))
+        model = gensim.models.Word2Vec(src_nouns, size=num_dim,workers=6)
+        print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
+
+        # save model and word frequency count
+        print('Saving {}.wtvmodel and {}_wordfreq.pickle'.format(srcname, srcname))
+        model.save('{}{}.wtvmodel'.format(results_folder,srcname))
+        with open(results_folder + srcname + '_wordfreq.pickle','wb') as f:
+            pickle.dump(freq_dist, f)
+        print()
 
