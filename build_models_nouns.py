@@ -106,11 +106,13 @@ if __name__ == "__main__":
         src_nouns = []
         for sent in src_sent_tagged:
             if sent is None or sent == [] or sent == ():
+                src_sent_tagged.remove(sent)
                 continue
             else:
-                src_nouns.append(([list(filter(lambda x: x[-1] == 'NN', sent))]))
+                n = [x for x in sent if x[-1] == 'NN']
+                src_nouns.append(n)
 
-        ptprint.pprint(src_nouns[:100])
+        print(src_nouns[:100])
 
         #get rid of the "NN"s from the list
         print("Removing everything but nouns")
@@ -124,7 +126,7 @@ if __name__ == "__main__":
                     src_nouns_2.append(n)
 
         src_nouns = src_nouns_2
-        ptprint.pprint(src_nouns)
+        print(src_nouns)
 
         # #create a giant string of all of the nouns (for use later)
         # nounstring = ' '.join(str(word) for sent in src_nouns for word in sent)
