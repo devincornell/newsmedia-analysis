@@ -9,6 +9,7 @@ from os import walk
 import numpy as np
 import pickle
 import sys
+import sparsify
 
 # calculates relation dictionary (as edge attributes) between every word pair
 def get_relations(u_vec, v_vec):
@@ -137,7 +138,7 @@ if __name__ == "__main__":
 
     #creatin n' savin' sparsified graphs
     for src in graphs.keys():
-        if edge_retain_ratio:
+        if edge_retain_ratio < 1.0 and edge_retain_ratio > 0.0:
             # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
             print('Removing weak edges..')
             edges = G.edges(data=True)

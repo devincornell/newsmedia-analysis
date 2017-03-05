@@ -49,7 +49,7 @@ def deg(n,G,attr='weight'):
     hood = G.neighbors(n)
     return sum([G.edge[n][v][attr] for v in hood])
 
-def sparsify_graph(G,weight_attr,new_attr,processes=16,verbose=False):
+def sparsify_graph(G,keep_fraction=0.5,weight_attr='weight',new_attr='p-val',processes=16,verbose=False):
 
 
     if verbose: print('Compiling pool data..')
