@@ -13,13 +13,9 @@ import re
 pp.style.use('ggplot')
 ptprint = (pprint.PrettyPrinter(indent=3))
 
-def remove_specialchars(tstr):
-    return tstr\
-        .replace(u'\\','')\
-        .replace(u"'",'')\
-        .replace(u'"','')\
-        .replace(u'-','')\
-        .replace(u',','')\
+def remove_specialchars(paragraph,stopwords,specialchars):
+    newpar = [w for w in paragraph if w not in stopwords]
+    return newpar
 
 
 def get_source_data(fname,verbose=False):
@@ -42,6 +38,7 @@ if __name__ == "__main__":
     # script params
     results_folder = 'results/'
     num_dim = 50
+    specialchars = ["'",'"',',','.','&']
 
     sources = {
         'breitbart': 'Data/scraped_articles_breitbart.json',
@@ -57,115 +54,36 @@ if __name__ == "__main__":
         }
 
     stopwords = nltk.corpus.stopwords.words('english')
+    all_paragraphs = list()
     for srcname, srcfile in sources.items():
         articles = get_source_data(srcfile)
-        src_sent = list()
+        src_par = list()
         for url, art in articles.items():
-            story = art['story_content'].decode('utf-8', errors='ignore')
-            pars = [re.split(r'\n\n', story)]
+            story = art['story_content'].decode('ascii', errors='ignore')
+            pars = story.split('\n\n')
 
-            print(pars[:10])
+            for p in pars:
+                src_par.append(nltk.word_tokenize(p))
 
-            pars = [par for par in pars if par]
+        # remove special characters and stopwords
+        src_par = [remove_specialchars(par,stopwords,specialchars) for par in src_par]
 
-            #still trying to figure this part out
+        # convert to lower case
+        src_pars = [w.lower() for par in src_par for w in par]
 
-            # par_tokens = []
-            # for par in pars:
-            #     for sent in par:
-            #         n = [nltk.word_tokenize(word) for word in sent if word]
-            #         par_tokens.append(n)
-            #
-            # print(par_tokens[:10])
-
-            #par_tokens = [remove_specialchars(par) for par in par_tokens]
-
-            #src_sent = src_sent + par_tokens
-
-        # break each sentence into a list of lower case words without the '.' character
-        # print("Making lists of lowercase words")
-        # src_sent = [sent.lower() for sent in src_sent if sent]
-        # src_pars = [list(re.split('\s{4,}', sent)) for sent in src_sent]
-        #
-        # print(src_sent[:1])
-        # print(src_pars[:1])
-
-        # src_pars = [list(map(lambda x: x.lower(), ) for sent in src_sent]
-
-        # # remove a period at the end of every sentence
-        # for i in range(len(src_sent)):
-        #     if len(src_sent[i]) > 0 and len(src_sent[i][-1]) > 0 and src_sent[i][-1][-1] == '.':
-        #         src_sent[i][-1] = src_sent[i][-1][:-1]
-        #
-        # # apply ascii encodings (by ommitting non-ascii chars)
-        # src_sent = [list(map(lambda x: x.encode('ascii',errors='ignore').decode(), sent)) for sent in src_sent]
-        #
-        # # remove stopwords from sentences
-        # print("Removing stopwords")
-        # src_sent = [list(filter(lambda x: x not in stopwords, sent)) for sent in src_sent]
-        #
-        # print(src_sent[:10])
-        #
-        # # POS Tagging
-        # print("Tagging parts of speech")
-        #
-        # src_sent_tagged = []
-        #
-        # src_sent = [sent for sent in src_sent if sent]
-        #
-        # for sent in src_sent:
-        #     if sent is None or sent == [] or sent == ():
-        #         continue
-        #     else:
-        #         try:
-        #             n = nltk.pos_tag(sent)
-        #             src_sent_tagged.append(n)
-        #         except IndexError:
-        #             continue
-        #
-        # src_sent_tagged = [sent for sent in src_sent_tagged if sent]
-        #
-        # print(src_sent_tagged[:10])
-        #
-        # #create list of nouns
-        # print("Creating a list of nouns")
-        #
-        # src_nouns = [[n for n in sent if n and n[-1] == 'NN'] for sent in src_sent_tagged]
-        #
-        # print(src_nouns[:10])
-        #
-        # #get rid of the "NN"s from the list
-        # print("Removing everything but nouns")
-        #
-        # src_nouns_2 = [[n[0] for n in sent] for sent in src_nouns]
-        #
-        # src_nouns = src_nouns_2
-        # print(src_nouns)
-        #
-        # #create a giant string of all of the nouns (for use later)
-        # print("Creating a string of all nouns in corpus")
-        # nounstring = ' '.join(str(word) for sent in src_nouns for word in sent)
-        # import re
-        # text = re.sub(r'^http?:\/\/.*[\r\n]*', '', nounstring)
-        #
-        # # # lemmatize words using wordnet corpus
-        # # lmtzr = WordNetLemmatizer()
-        # # src_sent = [list(map(lambda x:lmtzr.lemmatize(x),sent)) for sent in src_sent]
-        #
         # # calculate frequency information for each word
-        # freq_dist = nltk.FreqDist([w for s in src_nouns for w in s])
-        #
-        #
-        # # train model on all sentences from source
-        # print('{} sentences for {}.'.format(len(src_nouns), srcname))
-        # print("Training model on {}".format(srcname))
-        # model = gensim.models.Word2Vec(src_nouns, size=num_dim,workers=6)
-        # print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
-        #
-        # # save model and word frequency count
-        # print('Saving {}.wtvmodel and {}_wordfreq.pickle'.format(srcname, srcname))
-        # model.save('{}{}.wtvmodel'.format(results_folder,srcname))
-        # with open(results_folder + srcname + '_wordfreq.pickle','wb') as f:
-        #     pickle.dump(freq_dist, f)
-        # print()
+        freq_dist = nltk.FreqDist([w for s in src_par for w in s])
+
+        # train model on all sentences from source
+        print('{} sentences for {}.'.format(len(src_par), srcname))
+        print("Training model on {}".format(srcname))
+        model = gensim.models.Word2Vec(src_par, size=num_dim,workers=6)
+        print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
+        
+        # save model and word frequency count
+        print('Saving {}.wtvmodel and {}_wordfreq.pickle'.format(srcname, srcname))
+        model.save('{}{}.wtvmodel'.format(results_folder,srcname))
+        with open(results_folder + srcname + '_wordfreq.pickle','wb') as f:
+            pickle.dump(freq_dist, f)
+        print()
         #
