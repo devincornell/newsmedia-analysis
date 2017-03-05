@@ -10,11 +10,14 @@ import matplotlib.pyplot as pp
 import pprint
 import re
 
+punctlist = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '``']
+
 pp.style.use('ggplot')
 ptprint = (pprint.PrettyPrinter(indent=3))
 
 def remove_specialchars(paragraph,stopwords,specialchars):
     newpar = [w for w in paragraph if w not in stopwords]
+    newpar = [w for w in newpar if w not in punctlist]
     return newpar
 
 
@@ -65,11 +68,14 @@ if __name__ == "__main__":
             for p in pars:
                 src_par.append(nltk.word_tokenize(p))
 
-        # remove special characters and stopwords
-        src_par = [remove_specialchars(par,stopwords,specialchars) for par in src_par]
+        # remove stopwords
+        src_par = [[w for w in par if w not in stopwords] for par in src_par]
+
+        # remove special characters
+        src_par = [[w for w in par if w not in punctlist] for par in src_par]
 
         # convert to lower case
-        src_pars = [w.lower() for par in src_par for w in par]
+        src_par = [[w.lower() for w in par] for par in src_par]
 
         # # calculate frequency information for each word
         freq_dist = nltk.FreqDist([w for s in src_par for w in s])
@@ -79,11 +85,10 @@ if __name__ == "__main__":
         print("Training model on {}".format(srcname))
         model = gensim.models.Word2Vec(src_par, size=num_dim,workers=6)
         print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
-        
+
         # save model and word frequency count
         print('Saving {}.wtvmodel and {}_wordfreq.pickle'.format(srcname, srcname))
         model.save('{}{}.wtvmodel'.format(results_folder,srcname))
         with open(results_folder + srcname + '_wordfreq.pickle','wb') as f:
             pickle.dump(freq_dist, f)
         print()
-        #

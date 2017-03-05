@@ -149,7 +149,7 @@ if __name__ == "__main__":
             print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
             ofname = src + '_sparse.gexf'
             print('Writing file {}\n'.format(ofname))
-            nx.write_gexf(G, results_folder + src + ofname + '.gexf')
+            nx.write_gexf(G, results_folder + ofname)
 
         else:
             print('Retaining all edges.')
