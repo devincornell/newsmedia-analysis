@@ -75,7 +75,7 @@ if __name__ == "__main__":
         src_par = [[w.lower() for w in par] for par in src_par]
 
         # remove stopwords
-        src_par = [[w for w in par if w not in stopwords] for par in src_par if w.isalnum()]
+        src_par = [[w for w in par if w not in stopwords and w.isalnum()] for par in src_par]
 
         # # calculate frequency information for each word
         freq_dist = nltk.FreqDist([w for s in src_par for w in s])
