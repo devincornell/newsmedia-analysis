@@ -68,14 +68,14 @@ if __name__ == "__main__":
             for p in pars:
                 src_par.append(nltk.word_tokenize(p))
 
-        # remove stopwords
-        src_par = [[w for w in par if w not in stopwords] for par in src_par]
-
         # remove special characters
         src_par = [[w for w in par if w not in punctlist] for par in src_par]
 
         # convert to lower case
         src_par = [[w.lower() for w in par] for par in src_par]
+
+        # remove stopwords
+        src_par = [[w for w in par if w not in stopwords] for par in src_par if w.isalnum()]
 
         # # calculate frequency information for each word
         freq_dist = nltk.FreqDist([w for s in src_par for w in s])
