@@ -101,15 +101,16 @@ if __name__ == "__main__":
         src_nouns_2 = [[n[0] for n in par] for par in src_nouns]
 
         src_nouns = src_nouns_2
-        print(src_nouns)
 
         # convert to lower case
         src_par = [[w.lower() for w in par] for par in src_par]
 
         # remove stopwords
+        print('removing stopwords')
         src_par = [[w for w in par if w not in stopwords and w.isalnum()] for par in src_par]
 
         # # calculate frequency information for each word
+        print('calculating frequency distribution for {}'.format(srcname))
         freq_dist = nltk.FreqDist([w for s in src_par for w in s])
 
         # train model on all sentences from source
