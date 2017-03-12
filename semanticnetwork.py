@@ -3,14 +3,16 @@ import networkx as nx
 import gensim.models
 import itertools
 import numpy as np
+from multiprocessing import Pool
 
 def build_semanticnetwork(\
     text=None, \
     model=None, \
-    relationfunc=None, \
+    distfunc=None, \
     num_dim=100, \
     nodeattrs=None, \
     edgeattrs=None, \
+    workers=None,
     verbose=False \
     ):
     ''' This function will build a semantic network from either:
@@ -58,19 +60,37 @@ def build_semanticnetwork(\
     
     G = nx.Graph() # fresh new graph
 
-    # add nodes, apply node attr functions
+    # add nodes, apply node attr functions (ie centrality, etc)
     G.add_nodes_from(vocab)
     if nodeattrs is not None:
         for attr, attrfunc in nodeattrs.items():
             attrvals = attrfunc(G)
             nx.set_node_attributes(G,attrname,attrvals)
 
-    # add edges, apply edge attr functions
-    edges = itertools.product(vocab,vocab)
-    for (u,v) in edges:
-        G.add_edge(u,v,attr_dict=get_relations(model[u],model[v]))
-        
-    if edgeattr is not None:
+    # add edges, apply edge attr functions (possibly in parallel)
+    edges = list(itertools.product(vocab,vocab)) # lazy (use as needed)
+    vecpairs = ((model[u],model[v]) for (u,v) in edges) # also lazy
+    if workers is not None:
+        print('starting pool')
+        with Pool(workers) as p:
+            distances = p.map(distfunc,vecpairs)
+        print('pool finished')
+    else:
+        distances = map(distfunc,vecpairs)
+
+    #for d in distances:
+    #    print(d)
+    #print(list(distances))
+    #print('setting edge attributes')
+    #print(len(list(vecpairs)))
+    pairs = dict({e:v for e,v in zip(edges,distances)})
+    print(G.nodes())
+    nx.set_edge_attributes(G,'dist',pairs)
+    print('finished setting edge attributes')
+    print(G.edges())
+
+    # perform calculations on edges (ie flow, etc)
+    if edgeattrs is not None:
         for attr, attrfunc in edgeattr.items():
             attrvals = attrfunc(G)
             nx.set_edge_attributes(G,attrname,attrvals)
@@ -115,14 +135,21 @@ def open_model(model_file=None, wordattr_file=None, wordattr_file=None, verbose=
 
 '''
 
-def get_relations(u_vec, v_vec):
+def get_relations(e):
+    u_vec, v_vec = e[0],e[1]
     rel = dict()
     u_vec = u_vec/np.linalg.norm(u_vec)
     v_vec = v_vec/np.linalg.norm(v_vec)
     rel['l2_dist'] = float(np.linalg.norm(u_vec-v_vec))
 
-    return rel
+    return rel['l2_dist']
 
 if __name__ == '__main__':
-    model = gensim.models.Word2Vec.load('results/foxnews.wtvmodel')
-    build_semanticnetwork(model=model, relationfunc=get_relations)
+
+    a = itertools.product([1,2,3],[5,6,7])
+    b = (x[0]*x[1] for x in a)
+    #print(list(b))
+    model = gensim.models.Word2Vec([['a','b','c'],['c','a','lol','haha'],['this','sucks','a','c']],size=3,min_count=1)
+    #model = gensim.models.Word2Vec.load('results/cnn.wtvmodel')
+
+    G = build_semanticnetwork(model=model, distfunc=get_relations, workers=None)
