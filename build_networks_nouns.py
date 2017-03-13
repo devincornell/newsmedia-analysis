@@ -23,9 +23,9 @@ def get_relations(u_vec, v_vec):
 
 if __name__ == "__main__":
     results_folder = 'results/'
-    model_extension = '.wtvmodel'
-    wf_extension = '_wordfreq.pickle'
-    n = 1000 # top n words to keep from each source
+    model_extension = 'nouns.wtvmodel'
+    wf_extension = '_nounfreq.pickle'
+    n = 500 # top n words to keep from each source
     remove_all_but_central = False
     central_nodes = 30 # number of most central nodes to keep
     remove_weakest_edges = True
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # load models into models where models['srcname']['model'] = wtvmodel
     models = dict()
     for file in modelfiles:
-        srcname = file.split('.')[0]
+        srcname = file.split('_')[0]
         models[srcname] = dict()
         
         # this is a genism.models.Word2Freq object
@@ -56,13 +56,13 @@ if __name__ == "__main__":
 
         # this is a nltk.FreqDist object
         with open(results_folder + srcname + wf_extension, 'rb') as f:
-            models[srcname]['wordfreq'] = pickle.load(f)
+            models[srcname]['nounfreq'] = pickle.load(f)
 
     # decide which words to use based on frequency of appearance
     candidset = set()
     srcvocabs = list()
     for src,dat in models.items():
-        candidset |= set([x[0] for x in dat['wordfreq'].most_common(n)])
+        candidset |= set([x[0] for x in dat['nounfreq'].most_common(n)])
         srcvocabs.append(set(dat['model'].vocab.keys()))
 
     # remove words that don't appear in all sources
@@ -90,7 +90,7 @@ if __name__ == "__main__":
         G = nx.Graph()
         for v in nodeset:
             if v in srcvocab:
-                G.add_node(v,freq=dat['wordfreq'][v])
+                G.add_node(v,freq=dat['nounfreq'][v])
 
         for u in G.nodes():
             for v in G.nodes():
