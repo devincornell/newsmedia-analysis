@@ -49,45 +49,44 @@ def build_semanticnetwork(\
     
     # build model
     if text is not None:
-        print("Training model on {} wordgroups.".format(len(text)))
+        if verbose: print("Training model on {} wordgroups.".format(len(text)))
         model = gensim.models.Word2Vec(text, size=num_dim, workers=20)
-        print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
+        if verbose: print('model contains {} words.'.format(len(model.vocab.keys())))
 
     # build graph
-    # look through each model to check vocab size
-    vocab = list(model.vocab.keys())
-    if verbose: print('Building graph of {} nodes...'.format(len(vocab)))
+    if verbose: print('Building graph of {} nodes...'.format(len(model.vocab.keys())))
     
     G = nx.Graph() # fresh new graph
 
     # add nodes, apply node attr functions (ie centrality, etc)
-    G.add_nodes_from(vocab)
+    G.add_nodes_from(list(model.vocab.keys()))
     if nodeattrs is not None:
         for attr, attrfunc in nodeattrs.items():
             attrvals = attrfunc(G)
             nx.set_node_attributes(G,attrname,attrvals)
 
     # add edges, apply edge attr functions (possibly in parallel)
-    edges = list(itertools.product(vocab,vocab)) # lazy (use as needed)
-    vecpairs = ((model[u],model[v]) for (u,v) in edges) # also lazy
+    '''
+    edges = itertools.product(model.vocab.keys(),model.vocab.keys()) # generator
+    vecpairs = [(model[u],model[v]) for (u,v) in edges] # also lazy
     if workers is not None:
-        print('starting pool')
+        if verbose: print('starting pool..')
         with Pool(workers) as p:
             distances = p.map(distfunc,vecpairs)
-        print('pool finished')
+        if verbose: print('pool finished..')
     else:
         distances = map(distfunc,vecpairs)
+    '''
+    print('Calculating distances..')
+    edges = itertools.product(model.vocab.keys(),model.vocab.keys())
+    distances = {(u,v):model.wv.similarity(u,v) for (u,v) in edges}
+    print('Finished calculating distances..')
 
-    #for d in distances:
-    #    print(d)
-    #print(list(distances))
-    #print('setting edge attributes')
-    #print(len(list(vecpairs)))
-    pairs = dict({e:v for e,v in zip(edges,distances)})
-    print(G.nodes())
-    nx.set_edge_attributes(G,'dist',pairs)
-    print('finished setting edge attributes')
-    print(G.edges())
+    edgesa, edgesb = itertools.tee(itertools.product(model.vocab.keys(),model.vocab.keys()))
+    G.add_edges_from(edgesa)
+    pairs = {e:v for e,v in zip(edgesb,distances)}
+    nx.set_edge_attributes(G, 'dist', pairs)
+    if verbose: print('finished setting edge attributes')
 
     # perform calculations on edges (ie flow, etc)
     if edgeattrs is not None:
@@ -146,10 +145,10 @@ def get_relations(e):
 
 if __name__ == '__main__':
 
-    a = itertools.product([1,2,3],[5,6,7])
-    b = (x[0]*x[1] for x in a)
-    #print(list(b))
-    model = gensim.models.Word2Vec([['a','b','c'],['c','a','lol','haha'],['this','sucks','a','c']],size=3,min_count=1)
-    #model = gensim.models.Word2Vec.load('results/cnn.wtvmodel')
-
-    G = build_semanticnetwork(model=model, distfunc=get_relations, workers=None)
+    #model = gensim.models.Word2Vec([['a','b','c'],['c','a','lol','haha'],['this','sucks','a','c']],size=3,min_count=1)
+    model = gensim.models.Word2Vec.load('results/cnn.wtvmodel')
+    import time
+    start = time.time()
+    G = build_semanticnetwork(model=model, distfunc=get_relations, workers=20, verbose=True)
+    end = time.time()
+    print('Took {} seconds.'.format(end-start))
