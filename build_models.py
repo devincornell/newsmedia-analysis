@@ -42,6 +42,11 @@ if __name__ == "__main__":
         'cnn': 'Data/scraped_articles_cnn.json',
         'foxnews': 'Data/scraped_articles_foxnews.json',
         'nytimes': 'Data/scraped_articles_nytimes.json',
+        'wapo': 'Data/scraped_articles_washingtonpost.json',
+        'huffpo': 'Data/scraped_articles_huffingtonpost.json',
+        'reuters': 'Data/scraped_articles_reuters.json',
+        'usatoday': 'Data/scraped_articles_usatoday.json',
+        'watimes': 'Data/scraped_articles_washingtontimes.json',
         }
     
     stopwords = nltk.corpus.stopwords.words('english')
@@ -60,8 +65,8 @@ if __name__ == "__main__":
 
         # remove a period at the end of every sentence
         for i in range(len(src_sent)):
-        	if len(src_sent[i]) > 0 and len(src_sent[i][-1]) > 0 and src_sent[i][-1][-1] == '.':
-        		src_sent[i][-1] = src_sent[i][-1][:-1]
+            if len(src_sent[i]) > 0 and len(src_sent[i][-1]) > 0 and src_sent[i][-1][-1] == '.':
+                src_sent[i][-1] = src_sent[i][-1][:-1]
 
         # apply ascii encodings (by ommitting non-ascii chars)
         src_sent = [list(map(lambda x: x.encode('ascii',errors='ignore').decode(), sent)) for sent in src_sent]

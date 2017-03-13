@@ -9,6 +9,7 @@ from os import walk
 import numpy as np
 import pickle
 import sys
+import sparsify
 
 # calculates relation dictionary (as edge attributes) between every word pair
 def get_relations(u_vec, v_vec):
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     remove_all_but_central = False
     central_nodes = 30 # number of most central nodes to keep
     remove_weakest_edges = True
-    edge_retain_ratio = 0.5
+    edge_retain_ratio = 0.3
 
 
     if len(sys.argv) > 1:
@@ -128,35 +129,36 @@ if __name__ == "__main__":
         print('Keeping all nodes from each source.')
         # calculate new statistics on partial graph
 
-
-    if edge_retain_ratio:
-        # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
-        print('Removing weak edges..')
-        edges = G.edges(data=True)
-        sedges = sorted(edges,key=lambda x:x[2]['weight'])
-        keep_num = int(len(edges)*edge_retain_ratio)
-        remove_edges = [(x[0],x[1]) for x in sedges[-keep_num:]]
-        G.remove_edges_from(remove_edges)
-        num_edges = len(G.edges())
-        print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
-    else:
-        print('Retaining al edges.')
-
-    # visualization parameters
-    # cytoscape uses viz_size, viz_transparency, viz_color
-    #print('Applying visualization attributes.\n')
-    #for src in graphs.keys():
-    #    eig_cent = nx.get_node_attributes(G,'eig_cent')
-    #    viz_size = {n:v*200 for n,v in eig_cent.items()}
-    #    nx.set_node_attributes(graphs[src],'viz_size', viz_size)
-
     for src in graphs.keys():
         # save .gexf file
-        print('Saving {}{}.gexf file'.format(results_folder,src))
-        nx.write_gexf(graphs[src],results_folder + src + '.gexf')
+        print('Saving {}{}.gexf file'.format(results_folder, src))
+        nx.write_gexf(graphs[src], results_folder + src + '.gexf')
 
         print()
 
+    #creatin n' savin' sparsified graphs
+    for src in graphs.keys():
+        if edge_retain_ratio < 1.0 and edge_retain_ratio > 0.0:
+            # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
+            print('Removing weak edges..')
+            edges = G.edges(data=True)
+            sedges = sorted(edges,key=lambda x:x[2]['weight'])
+            keep_num = int(len(edges)*edge_retain_ratio)
+            remove_edges = [(x[0],x[1]) for x in sedges[-keep_num:]]
+            G.remove_edges_from(remove_edges)
+            num_edges = len(G.edges())
+            print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
+            ofname = src + '_sparse.gexf'
+            print('Writing file {}\n'.format(ofname))
+            nx.write_gexf(G, results_folder + ofname)
 
+        else:
+            print('Retaining all edges.')
 
-
+    # visualization parameters
+    # cytoscape uses viz_size, viz_transparency, viz_color
+    # print('Applying visualization attributes.\n')
+    # for src in graphs.keys():
+    # eig_cent = nx.get_node_attributes(G,'eig_cent')
+    # viz_size = {n:v*200 for n,v in eig_cent.items()}
+    # nx.set_node_attributes(graphs[src],'viz_size', viz_size)
