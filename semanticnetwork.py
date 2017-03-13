@@ -5,6 +5,7 @@ import itertools
 import numpy as np
 from multiprocessing import Pool
 from functools import partial
+import time
 
 def build_semanticnetwork(\
     text=None, \
@@ -63,6 +64,8 @@ def build_semanticnetwork(\
     # build graph
     if verbose: print('Building graph of {} nodes...'.format(len(usenodes)))
     
+    if verbose: start = time.time()
+
     G = nx.Graph() # fresh new graph
 
     # add nodes, apply node attr functions (ie centrality, etc)
@@ -76,7 +79,7 @@ def build_semanticnetwork(\
     edges = itertools.product(usenodes,usenodes)
     G.add_edges_from(edges)
 
-    print('Calculating distances..')
+    if verbose: print('Calculating distances..')
     if workers is not None: p = Pool(workers)
     for u in iter(usenodes):
         uv = model[u]
@@ -90,22 +93,15 @@ def build_semanticnetwork(\
 
         edges = ((u,v) for v in usenodes)
         nx.set_edge_attributes(G,distattr,{e:w for e,w in zip(edges,edgeweights)})
-    print('Finished calculating distances..')
+    
+    if verbose: print('Finished calculating distances..')
+    if verbose: end = time.time()
+    if verbose: print('Took {} seconds.'.format(end-start))
 
     return G
 
 
-def get_dist(ut,vt):
-    #ut,vt = *e
-    u, uv = ut[0], ut[1]
-    v, vv = vt[0], vt[1]
-
-    uv = uv/np.linalg.norm(uv)
-    vv = vv/np.linalg.norm(vv)
-
-    return ((u,v), float(np.linalg.norm(uv-vv)))
-
-def get_relations(u_vec,v_vec):
+def get_dist(u_vec,v_vec):
     #u_vec, v_vec = e[0],e[1]
     u_vec = u_vec/np.linalg.norm(u_vec)
     v_vec = v_vec/np.linalg.norm(v_vec)
@@ -119,9 +115,12 @@ if __name__ == '__main__':
     model = gensim.models.Word2Vec([['a','b','c'],['c','a','lol','haha'],['this','sucks','a','c']],size=3,min_count=1)
     model = gensim.models.Word2Vec.load('results/cnn.wtvmodel')
 
-    import time
-    start = time.time()
-    usenodes = list(model.vocab)[:1000]
-    G = build_semanticnetwork(model=model, distfunc=get_relations, usenodes=usenodes, verbose=True)
-    end = time.time()
-    print('Took {} seconds.'.format(end-start))
+    usenodes = model.vocab
+    
+    settings = { \
+        'model':model, \
+        'distfunc':get_dist, \
+        'usenodes':usenodes, \
+        'verbose':True \
+        }
+    G = build_semanticnetwork(**settings)
