@@ -199,6 +199,63 @@ def sparsify_graph(
     return G
 
 
+def drop_edges(G,drop_attr,keep_largest=True,verbose=False):
+
+    if keep_largest: desc = 'largest'
+    else: desc = 'smallest'
+    if verbose: print('Removing {} edges by {}..'.format(desc,drop_attr))
+    edges = G.edges(data=True)
+    sedges = sorted(edges,key=lambda x:x[2][drop_attr])
+    if keep_largest:
+        remove_edges = ((x[0],x[1]) for x in sedges[int(len(edges)*keep_fraction):])
+    else:
+        remove_edges = ((x[0],x[1]) for x in sedges[-int(len(edges)*keep_fraction):])
+    G.remove_edges_from(remove_edges)
+    num_edges = len(G.edges())
+    if verbose: print('{}% of edges retained: {} remain.'.format(int(num_edges/len(edges)*100),num_edges))
+    return G
+
+def drop_nodes(G,drop_attr, keep_largest=True, verbose=True):
+    if verbose:
+        if keep_largest: desc = 'largest'
+        else: desc = 'smallest'
+        print('Removing {} nodes by {}..'.format(desc,drop_attr))
+    
+    nodes = G.nodes(data=True)
+    snodes = sorted(nodes,key=lambda x:x[1][drop_attr])
+    if keep_largest:
+        remove_edges = ((x[0],x[1]) for x in snodes[int(len(nodes)*keep_fraction):])
+    else:
+        remove_edges = ((x[0],x[1]) for x in snodes[-int(len(nodes)*keep_fraction):])
+    G.remove_edges_from(remove_edges)
+    num_edges = len(G.nodes())
+    
+    if verbose: print('{}% of nodes retained: {} remain.'.format(int(num_edges/len(edges)*100),num_edges))
+    
+    return G
+
+##### Common Utilities #####
+
+def common_set(vocabs):
+    '''vocabs is a list of lists/sets'''
+    candidset = set()
+    for vocab in vocabs:
+        candidset |= vocab
+
+    removeset = set()
+    for word in candidset:
+        removeword = False
+        for vocab in vocabs:
+            if word not in vocab:
+                removeword = True
+        if removeword:
+            removeset.add(word)
+
+    # keep only words that appear in all vocabularies
+    return candidset - removeset
+
+
+
 if __name__ == '__main__':
 
     #model = gensim.models.Word2Vec([['a','b','c'],['c','a','lol','haha'],['this','sucks','a','c']],size=3,min_count=1)
