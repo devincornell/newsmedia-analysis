@@ -37,8 +37,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         results_folder = sys.argv[1]
         print('Using results folder {}.'.format(results_folder))
-
-    print()
+        print()
 
     # get model filenames
     modelfiles = list()
@@ -64,16 +63,15 @@ if __name__ == "__main__":
     vocabs = dict()
     for src,dat in models.items():
         vocab = dat['model'].vocab.keys()
-        cutoff = freq_cutoff/len(vocab)
-        frequentwords = (v for v in vocab if dat['wordfreq'].freq(v) > cutoff)
-
+        N = dat['wordfreq'].N()
+        frequentwords = (v for v in vocab if dat['wordfreq'].freq(v)*N > freq_cutoff)
         vocabs[src] = frequentwords
 
-    # above freq_cutoff in all sources
-    words = sn.common_set((v for v in vocabs.values()))
+    
+    # find common set of words in each reduced vocabulary
+    nodeset = sn.common_set((v for v in vocabs.values()))
 
-
-    print('Keeping {} nodes that appear {} times in all sources.'.format(len(nodeset), freq_cutoff))
+    print('Keeping {} nodes appear at least {} times in all sources.'.format(len(nodeset), freq_cutoff))
     print()
 
     # look through each model to check vocab size
@@ -82,28 +80,18 @@ if __name__ == "__main__":
         print(src)
         srcvocab = set(dat['model'].vocab.keys())
         print('Building {} graph...'.format(src))
-        
-        G = nx.Graph()
-        for v in nodeset:
-            if v in srcvocab:
-                G.add_node(v,freq=dat['wordfreq'][v])
-
-        for u in G.nodes():
-            for v in G.nodes():
-                if u != v: # no self-loops
-                    rel_dict = get_relations(dat['model'][u],dat['model'][v])
-                    G.add_edge(u,v,rel_dict)
-
-
-        # add attributes to complete graph for analysis later
-        weights = {(u,v):1/(G.edge[u][v]['l2_dist']**2) for u in G.edge for v in G.edge[u]}
-        nx.set_edge_attributes(G,'weight', weights)
-
-        eig_cent = nx.eigenvector_centrality(G,max_iter=int(1e4),tol=1e-4,weight='weight')
-        nx.set_node_attributes(G,'eig_cent', eig_cent)
-
+        settings = { 
+            'model': dat['model'], 
+            'usenodes': nodeset, 
+            'verbose': True, 
+            'nodeattrs': { 
+                'eigcent': lambda x: nx.eigenvector_centrality(x,1000,tol=1e-4),
+                },
+            }
+        G = sn.build_semanticnetwork(**settings)
         graphs[src] = G
     print()
+    exit()
 
     # remove some nodes from graph
     if remove_all_but_central:
