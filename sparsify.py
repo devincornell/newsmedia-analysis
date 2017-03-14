@@ -50,7 +50,7 @@ def deg(n,G,attr='weight'):
     return sum([G.edge[n][v][attr] for v in hood])
 
 def sparsify_graph(
-    G,
+    G=None,
     keep_fraction=0.5,
     weight_attr='weight',
     pval_attr='p-val',
@@ -102,7 +102,16 @@ if __name__ == '__main__':
     print('Finished loading {}.'.format(fname))
     print()
 
-    G = sparsify_graph(G,keep_fraction=0.1,weight_attr='weight',pval_attr='p-val',verbose=True)
+    settings = {
+        'G': G,
+        'keep_fraction': 0.1,
+        'weight_attr': 'weight',
+        'pval_attr': 'p-val',
+        'processes': 16,
+        'verbose':True,
+    }
+
+    G = sparsify_graph(**settings)
 
     ofname = src + '_sparse.gexf'
     print('Writing file {}\n'.format(ofname))
