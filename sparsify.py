@@ -49,32 +49,38 @@ def deg(n,G,attr='weight'):
     hood = G.neighbors(n)
     return sum([G.edge[n][v][attr] for v in hood])
 
-def sparsify_graph(G,keep_fraction=0.5,weight_attr='weight',new_attr='p-val',processes=16,verbose=False):
+def sparsify_graph(
+    G,
+    keep_fraction=0.5,
+    weight_attr='weight',
+    pval_attr='p-val',
+    processes=16,
+    verbose=False,
+    ):
 
 
     if verbose: print('Compiling pool data..')
     T = sum(nx.get_edge_attributes(G,weight_attr).values())
     pvals = dict()
     degrees = {u:deg(u,G) for u in G.nodes()}
-    edata = [((u,v),G.edge[u][v][weight_attr],degrees[u],degrees[v],T) for u in G.edge for v in G.edge[u]]
+    for (u,v) in G.edges():
+        print(weight_attr)
+        G.edge[u][v][weight_attr]
+        break
+    edata = (((u,v),G.edge[u][v][weight_attr],degrees[u],degrees[v],T) for (u,v) in G.edges())
     
     if verbose: print('Starting sparsification..')
     p = Pool(processes) # will never use that many
     pvals = p.map(pvalf,edata)
     if verbose: print('Sparsification finished.')
 
-    nx.set_edge_attributes(G,new_attr,{x[0]:x[1] for x in pvals})
+    nx.set_edge_attributes(G,pval_attr,{x[0]:x[1] for x in pvals})
 
     # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
     if verbose: print('Removing crappy edges..')
     edges = G.edges(data=True)
-<<<<<<< HEAD:sparsify_networks.py
-    sedges = sorted(edges,key=lambda x:x[2]['pval'])
-    remove_edges = [(x[0],x[1]) for x in sedges[-int(len(edges)*keep_fraction):]]
-=======
-    sedges = sorted(edges,key=lambda x:x[2][new_attr])
+    sedges = sorted(edges,key=lambda x:x[2][pval_attr])
     remove_edges = [(x[0],x[1]) for x in sedges[int(len(edges)*keep_fraction):]]
->>>>>>> e4a373b2a743231bc103fade79ccf07333fdb28d:sparsify.py
     G.remove_edges_from(remove_edges)
     num_edges = len(G.edges())
     if verbose: print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))        
@@ -90,23 +96,20 @@ if __name__ == '__main__':
         results_folder = sys.argv[1]
     else:
         results_folder = 'results/'
-    
-    graphfiles = list()
-    for (dirpath, dirnames, filenames) in walk(results_folder):
-        for fname in filenames:
-            if fname[-len(extension):] == extension and fname[-len(rejection):] != rejection:
-                src = fname.split('.')[0]
 
-                print('Loading {}.'.format(fname))
-                G = nx.read_gexf(results_folder + fname)
-                print('Finished loading {}.'.format(fname))
-                print()
+    fname = 'test.gexf'
+    src = fname.split('.')[0]
 
-                G = sparsify_graph(G,'weight','p-val',verbose=True)
+    print('Loading {}.'.format(fname))
+    G = nx.read_gexf(results_folder + fname)
+    print('Finished loading {}.'.format(fname))
+    print()
 
-                ofname = src + '_sparse.gexf'
-                print('Writing file {}\n'.format(ofname))
-                nx.write_gexf(G,ofname)
+    G = sparsify_graph(G,keep_fraction=0.1,weight_attr='weight',pval_attr='p-val',verbose=True)
+
+    ofname = src + '_sparse.gexf'
+    print('Writing file {}\n'.format(ofname))
+    nx.write_gexf(G,ofname)
 
 
 

@@ -7,17 +7,30 @@ from multiprocessing import Pool
 from functools import partial
 import time
 
-def build_semanticnetwork(\
-    text=None, \
-    model=None, \
-    distfunc=None, \
-    distattr = 'dist', \
-    num_dim=100, \
-    nodeattrs=None, \
-    usenodes = None, \
-    edgeattrs=None, \
-    workers=None,
-    verbose=False \
+
+def get_cosdist(u_vec,v_vec):
+    #u_vec, v_vec = e[0],e[1]
+    u_vec = u_vec/np.linalg.norm(u_vec)
+    v_vec = v_vec/np.linalg.norm(v_vec)
+    dist = float(np.linalg.norm(u_vec-v_vec))
+
+    return dist
+
+def calc_edgeweights(G, beta=2):
+    weights = {(u,v):G.edge[u][v]['dist']**(-beta) for (u,v) in G.edges()}
+    return weights
+
+def build_semanticnetwork(
+    text = None, 
+    model = None, 
+    usenodes = None, 
+    distfunc = get_cosdist, 
+    distattr = 'dist', 
+    num_dim = 100, 
+    nodeattrs = None, 
+    edgeattrs = {'weight': calc_edgeweights}, 
+    workers = None,
+    verbose = False 
     ):
     ''' This function will build a semantic network from either:
     a) a set of text blocks (sentences, paragraphs, documents, etc)
@@ -60,6 +73,9 @@ def build_semanticnetwork(\
     # use only these nodes
     if usenodes is None:
         usenodes = model.vocab.keys()
+        for n in usenodes:
+            if not n in model.vocab.keys():
+                raise(Exception('Not all usenodes are in the model dict.'))
 
     # build graph
     if verbose: print('Building graph of {} nodes...'.format(len(usenodes)))
@@ -69,58 +85,54 @@ def build_semanticnetwork(\
     G = nx.Graph() # fresh new graph
 
     # add nodes, apply node attr functions (ie centrality, etc)
-    G.add_nodes_from(usenodes)
-    if nodeattrs is not None:
-        for attr, attrfunc in nodeattrs.items():
-            attrvals = attrfunc(G)
-            nx.set_node_attributes(G,attrname,attrvals)
-
-    # set edges using iterator
-    edges = itertools.product(usenodes,usenodes)
-    G.add_edges_from(edges)
+    G.add_nodes_from(usenodes)    
 
     if verbose: print('Calculating distances..')
-    if workers is not None: p = Pool(workers)
-    for u in iter(usenodes):
+    for i in range(len(usenodes)):
+        u = usenodes[i]
         uv = model[u]
 
-        # access vocab w/o copying memory
-        vv_it = (model[v] for v in model.vocab)
-
         # map distances to vocab combinations
-        if workers is not None: edgeweights = p.starmap(distfunc, zip(vv_it,itertools.repeat(uv)))
-        else: edgeweights = map(distfunc, vv_it, uv)
-
-        edges = ((u,v) for v in usenodes)
-        nx.set_edge_attributes(G,distattr,{e:w for e,w in zip(edges,edgeweights)})
+        edgesa, edgesb = itertools.tee(((u,v) for v in usenodes[i+1:]))
+        G.add_edges_from(edgesa)
+        distances = (distfunc(uv,model[v]) for v in usenodes[i+1:])
+        nx.set_edge_attributes(G,distattr,{e:w for e,w in zip(edgesb,distances)})
     
     if verbose: print('Finished calculating distances..')
     if verbose: end = time.time()
-    if verbose: print('Took {} seconds.'.format(end-start))
+    if verbose: print('Took {} seconds to calculate distances for {} edges.'.format(end-start, len(G.edges())))
 
+    # apply supplied functions
+    if verbose: print('Calculating user functions..')
+    if verbose: start = time.time()
+    if nodeattrs is not None:
+        for attr, attrfunc in nodeattrs.items():
+            attrdict = attrfunc(G)
+            nx.set_node_attributes(G, attr, attrdict)
+    if edgeattrs is not None:
+        for attr, attrfunc in edgeattrs.items():
+            attrdict = attrfunc(G)
+            nx.set_edge_attributes(G, attr, attrdict)
+    if verbose: end = time.time()
+    if verbose: print('Took {} seconds to apply user functions.'.format(end-start))
     return G
-
-
-def get_dist(u_vec,v_vec):
-    #u_vec, v_vec = e[0],e[1]
-    u_vec = u_vec/np.linalg.norm(u_vec)
-    v_vec = v_vec/np.linalg.norm(v_vec)
-    dist = float(np.linalg.norm(u_vec-v_vec))
-
-    return dist
-
+    
 
 if __name__ == '__main__':
 
     model = gensim.models.Word2Vec([['a','b','c'],['c','a','lol','haha'],['this','sucks','a','c']],size=3,min_count=1)
     model = gensim.models.Word2Vec.load('results/cnn.wtvmodel')
 
-    usenodes = model.vocab
+    usenodes = list(model.vocab)[:1000]
     
-    settings = { \
-        'model':model, \
-        'distfunc':get_dist, \
-        'usenodes':usenodes, \
-        'verbose':True \
+    settings = { 
+        'model':model, 
+        'usenodes':usenodes, 
+        'verbose':True, 
+        'nodeattrs': { 
+            'eigcent': nx.eigenvector_centrality,
+            },
         }
     G = build_semanticnetwork(**settings)
+    print('Saving file..')
+    nx.write_gexf(G,'results/test.gexf')
