@@ -63,10 +63,7 @@ def sparsify_graph(
     T = sum(nx.get_edge_attributes(G,weight_attr).values())
     pvals = dict()
     degrees = {u:deg(u,G) for u in G.nodes()}
-    for (u,v) in G.edges():
-        print(weight_attr)
-        G.edge[u][v][weight_attr]
-        break
+
     edata = (((u,v),G.edge[u][v][weight_attr],degrees[u],degrees[v],T) for (u,v) in G.edges())
     
     if verbose: print('Starting sparsification..')
