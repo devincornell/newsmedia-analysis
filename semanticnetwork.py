@@ -164,7 +164,7 @@ def deg(n,G,attr='weight'):
     hood = G.neighbors(n)
     return sum([G.edge[n][v][attr] for v in hood])
 
-def sparsify_graph(
+def sparsify_edges_prefattach(
     G=None,
     keep_fraction=0.5,
     weight_attr='weight',
@@ -200,7 +200,7 @@ def sparsify_graph(
     return G
 
 
-def drop_edges(G, drop_attr, keep_largest=True, verbose=False):
+def drop_edges(G, drop_attr, fraction=0.5, keep_largest=True, verbose=False):
 
     if verbose:
         if keep_largest: desc = 'largest'
@@ -209,30 +209,31 @@ def drop_edges(G, drop_attr, keep_largest=True, verbose=False):
     edges = G.edges(data=True)
     sedges = sorted(edges,key=lambda x:x[2][drop_attr])
     if keep_largest:
-        remove_edges = ((x[0],x[1]) for x in sedges[int(len(edges)*keep_fraction):])
+        remove_edges = ((x[0],x[1]) for x in sedges[int(len(edges)*fraction):])
     else:
-        remove_edges = ((x[0],x[1]) for x in sedges[-int(len(edges)*keep_fraction):])
+        remove_edges = ((x[0],x[1]) for x in sedges[-int(len(edges)*fraction):])
     G.remove_edges_from(remove_edges)
     num_edges = len(G.edges())
     if verbose: print('{}% of edges retained: {} remain.'.format(int(num_edges/len(edges)*100),num_edges))
     return G
 
-def drop_nodes(G,drop_attr, keep_largest=True, verbose=True):
+def drop_nodes(G, drop_attr, number=10, keep_largest=True, verbose=True):
     if verbose:
         if keep_largest: desc = 'largest'
         else: desc = 'smallest'
         print('Removing {} nodes by {}..'.format(desc,drop_attr))
+
     
     nodes = G.nodes(data=True)
     snodes = sorted(nodes,key=lambda x:x[1][drop_attr])
     if keep_largest:
-        remove_edges = ((x[0],x[1]) for x in snodes[int(len(nodes)*keep_fraction):])
+        remove_edges = ((x[0],x[1][drop_attr]) for x in snodes[number:])
     else:
-        remove_edges = ((x[0],x[1]) for x in snodes[-int(len(nodes)*keep_fraction):])
+        remove_edges = ((x[0],x[1][drop_attr]) for x in snodes[-number:])
     G.remove_edges_from(remove_edges)
-    num_edges = len(G.nodes())
+    num_nodes = len(G.nodes())
     
-    if verbose: print('{}% of nodes retained: {} remain.'.format(int(num_edges/len(edges)*100),num_edges))
+    if verbose: print('{}% of nodes retained: {} remain.'.format(int(num_nodes/len(nodes)*100),num_nodes))
     
     return G
 

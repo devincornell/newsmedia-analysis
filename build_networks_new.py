@@ -14,6 +14,24 @@ import semanticnetwork as sn
 
 
 
+
+## basic utilities
+
+def getfilenames(results_folder, model_extension, wf_extension):
+    # get model filenames
+    files = dict()
+    modelfiles, wordfreqfiles = list(), list()
+    for (dirpath, dirnames, filenames) in walk(results_folder):
+        for file in filenames:
+            if file[-len(model_extension):] == model_extension:
+                srcname = file.split('.')[0]
+                files[srcname] = dict()
+                files[srcname]['model'] = results_folder + file
+                files[srcname]['wordfreq'] = results_folder + srcname + wf_extension
+    return files
+
+
+
 if __name__ == "__main__":
     # file settings
     results_folder = 'results/'
@@ -21,15 +39,17 @@ if __name__ == "__main__":
     wf_extension = '_wordfreq.pickle'
 
     # frequency settings
-    freq_cutoff = 5
+    freq_cutoff = 50 # min number of appearances in each source for a word
 
-    # reduction/sparsification
-    remove_all_but_central = False
-    num_nodes_retained = 30 # number of most central nodes to keep
-    remove_weakest_edges = True
-    edge_retain_ratio = 0.1
-    
-
+    # reduction/sparsification settings
+    drop_nodes = True
+    num_nodes_retained = 10 # number of most central nodes to keep
+    sparsify_edges = True
+    sparsify_retain_ratio = 0.1 # percentage of edges to keep
+    drop_edges = True
+    fraction_edges_retained = 0.5 # percentage of edges to keep (after sparsifying, if nessecary)
+ 
+    # get filenames
     if len(sys.argv) > 1:
         results_folder = sys.argv[1]
         print('Using results folder {}.'.format(results_folder))
@@ -39,7 +59,6 @@ if __name__ == "__main__":
 
 
     # load wordfreq files to decide which nodes to use
-    #wordfreqs = dict()
     wordfreqs = list()
     for src in files.keys():
         print(files[src]['wordfreq'])
@@ -48,12 +67,10 @@ if __name__ == "__main__":
         print('found', len(wf.keys()), 'words.')
         wordfreqs.append([w for w in wf.keys() if wf[w] > freq_cutoff])
 
-    # skipping 
     
     # find common set of words in each reduced vocabulary
     print('Finding common set of words.')
     nodeset = sn.common_set(wordfreqs)
-
     print('Keeping {} nodes appear at least {} times in all sources.'.format(len(nodeset), freq_cutoff))
     print()
 
@@ -76,22 +93,29 @@ if __name__ == "__main__":
             }
         G = sn.build_semanticnetwork(**settings)
         print(len(G.nodes()), 'in', src)
+
+        if drop_nodes:
+            print('Now removing nodes that are least central: keeping {} nodes.'.format(num_nodes_retained))
+            sn.drop_nodes(G,'eigcent', number=num_nodes_retained, keep_largest=True, verbose=True)
+
+
+        if sparsify_edges:
+            print('Now sparsifying edges..')
+
+            settings = {
+                'G': G,
+                'keep_fraction': sparsify_retain_ratio, # percentage of edges to keep
+                'weight_attr': 'weight', # used for cutoff
+                'pval_attr': 'p-val', # added attr for stat. sig.
+                'processes': 16, # split up the work
+                'verbose':True,
+                }
+            G = sn.sparsify_edges_prefattach(**settings)
+
+        if drop_edges:
+            print('Now dropping {}% of edges..'.format(100*fraction_edges_retained))
+            sn.drop_edges(G,'weight', fraction=fraction_edges_retained, keep_largest=True, verbose=True)
+
         print('Writing file..')
-        G.write_gexf(results_folder + src + '.gexf')
-
-
-
-## basic utilities
-
-def getfilenames(results_folder, model_extension, wf_extension):
-    # get model filenames
-    files = dict()
-    modelfiles, wordfreqfiles = list(), list()
-    for (dirpath, dirnames, filenames) in walk(results_folder):
-        for file in filenames:
-            if file[-len(model_extension):] == model_extension:
-                srcname = file.split('.')[0]
-                files[srcname] = dict()
-                files[srcname]['model'] = results_folder + file
-                files[srcname]['wordfreq'] = results_folder + srcname + wf_extension
-    return files
+        nx.write_gexf(G, results_folder + src + '_sparse.gexf')
+        print()
