@@ -33,28 +33,30 @@ def getfilenames(results_folder, model_extension, wf_extension):
 
 
 if __name__ == "__main__":
+    ## SETTINGS
     # file settings
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
 
     # frequency settings
-    freq_cutoff = 50 # min number of appearances in each source for a word
+    freq_cutoff = 5 # min number of appearances in each source for a word
 
     # reduction/sparsification settings
     drop_nodes = True
-    num_nodes_retained = 10 # number of most central nodes to keep
-    sparsify_edges = True
-    sparsify_retain_ratio = 0.1 # percentage of edges to keep
+    num_nodes_retained = 30 # number of most central nodes to keep
+    sparsify_edges = False
+    sparsify_retain_ratio = 0.3 # percentage of edges to keep
     drop_edges = True
-    fraction_edges_retained = 0.5 # percentage of edges to keep (after sparsifying, if nessecary)
+    fraction_edges_retained = 0.3 # percentage of edges to keep (after sparsifying, if nessecary)
  
+
+    ## CODE STARTS
     # get filenames
     if len(sys.argv) > 1:
         results_folder = sys.argv[1]
         print('Using results folder {}.'.format(results_folder))
         print()
-
     files = getfilenames(results_folder, model_extension, wf_extension)
 
 
@@ -96,7 +98,7 @@ if __name__ == "__main__":
 
         if drop_nodes:
             print('Now removing nodes that are least central: keeping {} nodes.'.format(num_nodes_retained))
-            sn.drop_nodes(G,'eigcent', number=num_nodes_retained, keep_largest=True, verbose=True)
+            G = sn.drop_nodes(G,'eigcent', number=num_nodes_retained, keep_largest=True, verbose=True)
 
 
         if sparsify_edges:
@@ -113,8 +115,8 @@ if __name__ == "__main__":
             G = sn.sparsify_edges_prefattach(**settings)
 
         if drop_edges:
-            print('Now dropping {}% of edges..'.format(100*fraction_edges_retained))
-            sn.drop_edges(G,'weight', fraction=fraction_edges_retained, keep_largest=True, verbose=True)
+            print('Keeping {}% of edges w/ highest weight..'.format(100*fraction_edges_retained))
+            G = sn.drop_edges(G,'weight', fraction=fraction_edges_retained, keep_largest=True, verbose=True)
 
         print('Writing file..')
         nx.write_gexf(G, results_folder + src + '_sparse.gexf')

@@ -201,15 +201,14 @@ def sparsify_edges_prefattach(
 
 
 def drop_edges(G, drop_attr, fraction=0.5, keep_largest=True, verbose=False):
-
     if verbose:
         if keep_largest: desc = 'largest'
         else: desc = 'smallest'
-        print('Removing {} edges by {}..'.format(desc,drop_attr))
+        print('Keeping {} edges by {}..'.format(desc,drop_attr))
     edges = G.edges(data=True)
     sedges = sorted(edges,key=lambda x:x[2][drop_attr])
     if keep_largest:
-        remove_edges = ((x[0],x[1]) for x in sedges[int(len(edges)*fraction):])
+        remove_edges = ((x[0],x[1]) for x in sedges[:-int(len(edges)*fraction)])
     else:
         remove_edges = ((x[0],x[1]) for x in sedges[-int(len(edges)*fraction):])
     G.remove_edges_from(remove_edges)
@@ -218,19 +217,20 @@ def drop_edges(G, drop_attr, fraction=0.5, keep_largest=True, verbose=False):
     return G
 
 def drop_nodes(G, drop_attr, number=10, keep_largest=True, verbose=True):
+    G = G.copy()
     if verbose:
         if keep_largest: desc = 'largest'
         else: desc = 'smallest'
-        print('Removing {} nodes by {}..'.format(desc,drop_attr))
+        print('Keeping {} nodes by {}..'.format(desc,drop_attr))
 
     
     nodes = G.nodes(data=True)
     snodes = sorted(nodes,key=lambda x:x[1][drop_attr])
     if keep_largest:
-        remove_edges = ((x[0],x[1][drop_attr]) for x in snodes[number:])
+        remove_nodes = (x[0] for x in snodes[:-number])
     else:
-        remove_edges = ((x[0],x[1][drop_attr]) for x in snodes[-number:])
-    G.remove_edges_from(remove_edges)
+        remove_nodes = (x[0] for x in snodes[-number:])
+    G.remove_nodes_from(remove_nodes)
     num_nodes = len(G.nodes())
     
     if verbose: print('{}% of nodes retained: {} remain.'.format(int(num_nodes/len(nodes)*100),num_nodes))
