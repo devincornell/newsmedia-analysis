@@ -12,76 +12,62 @@ import sys
 
 import semanticnetwork as sn
 
-# calculates relation dictionary (as edge attributes) between every word pair
-def get_relations(u_vec, v_vec):
-    rel = dict()
-    u_vec = u_vec/np.linalg.norm(u_vec)
-    v_vec = v_vec/np.linalg.norm(v_vec)
-    rel['l2_dist'] = float(np.linalg.norm(u_vec-v_vec))
-
-    return rel
 
 
 if __name__ == "__main__":
+    # file settings
     results_folder = 'results/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
-    n = 1000 # top n words to keep from each source
-    remove_all_but_central = False
-    central_nodes = 30 # number of most central nodes to keep
-    remove_weakest_edges = True
-    edge_retain_ratio = 0.3
-    freq_cutoff = 10
 
+    # frequency settings
+    freq_cutoff = 5
+
+    # reduction/sparsification
+    remove_all_but_central = False
+    num_nodes_retained = 30 # number of most central nodes to keep
+    remove_weakest_edges = True
+    edge_retain_ratio = 0.1
+    
 
     if len(sys.argv) > 1:
         results_folder = sys.argv[1]
         print('Using results folder {}.'.format(results_folder))
         print()
 
-    # get model filenames
-    modelfiles = list()
-    for (dirpath, dirnames, filenames) in walk(results_folder):
-        for file in filenames:
-            if file[-len(model_extension):] == model_extension:
-                modelfiles.append(file)
+    files = getfilenames(results_folder, model_extension, wf_extension)
 
-    # load models into models where models['srcname']['model'] = wtvmodel
-    models = dict()
-    for file in modelfiles:
-        srcname = file.split('.')[0]
-        models[srcname] = dict()
-        
-        # this is a genism.models.Word2Freq object
-        models[srcname]['model'] = gensim.models.Word2Vec.load(results_folder + file)
 
-        # this is a nltk.FreqDist object
-        with open(results_folder + srcname + wf_extension, 'rb') as f:
-            models[srcname]['wordfreq'] = pickle.load(f)
+    # load wordfreq files to decide which nodes to use
+    #wordfreqs = dict()
+    wordfreqs = list()
+    for src in files.keys():
+        print(files[src]['wordfreq'])
+        with open(files[src]['wordfreq'], 'rb') as f:
+            wf = pickle.load(f)
+        print('found', len(wf.keys()), 'words.')
+        wordfreqs.append([w for w in wf.keys() if wf[w] > freq_cutoff])
 
-    # decide which words to use based on frequency of appearance
-    vocabs = dict()
-    for src,dat in models.items():
-        vocab = dat['model'].vocab.keys()
-        N = dat['wordfreq'].N()
-        frequentwords = (v for v in vocab if dat['wordfreq'].freq(v)*N > freq_cutoff)
-        vocabs[src] = frequentwords
-
+    # skipping 
     
     # find common set of words in each reduced vocabulary
-    nodeset = sn.common_set((v for v in vocabs.values()))
+    print('Finding common set of words.')
+    nodeset = sn.common_set(wordfreqs)
 
     print('Keeping {} nodes appear at least {} times in all sources.'.format(len(nodeset), freq_cutoff))
     print()
 
     # look through each model to check vocab size
-    graphs = dict()
-    for src, dat in models.items():
-        print(src)
-        srcvocab = set(dat['model'].vocab.keys())
+
+    for src in files.keys():
+        modelf = files[src]['model'] # shallow copy
+        model = gensim.models.Word2Vec.load(modelf)
+
+        print('Loaded model for {}.'.format(src))
+
         print('Building {} graph...'.format(src))
-        settings = { 
-            'model': dat['model'], 
+        settings = {
+            'model': model,
             'usenodes': nodeset, 
             'verbose': True, 
             'nodeattrs': { 
@@ -89,60 +75,23 @@ if __name__ == "__main__":
                 },
             }
         G = sn.build_semanticnetwork(**settings)
-        graphs[src] = G
-    print()
-    exit()
+        print(len(G.nodes()), 'in', src)
+        print('Writing file..')
+        G.write_gexf(results_folder + src + '.gexf')
 
-    # remove some nodes from graph
-    if remove_all_but_central:
-        # get set of nodes to keep
-        keep_nodes = set()
-        for src in graphs.keys():
-            sort_nodes = sorted(graphs[src].nodes(data=True),key=lambda x:x[1]['eig_cent'])
-            keep_nodes |= set([n[0] for n in sort_nodes[-central_nodes:]])
 
-        # remove all but most central nodes
-        for src in graphs.keys():
-            rm_nodes = set(graphs[src].nodes()) - keep_nodes
-            graphs[src].remove_nodes_from(rm_nodes)
 
-        print('{} nodes found from all sources for comparison.'.format(len(keep_nodes)))
-        print()
+## basic utilities
 
-    else:
-        print('Keeping all nodes from each source.')
-        # calculate new statistics on partial graph
-
-    for src in graphs.keys():
-        # save .gexf file
-        print('Saving {}{}.gexf file'.format(results_folder, src))
-        nx.write_gexf(graphs[src], results_folder + src + '.gexf')
-
-        print()
-
-    #creatin n' savin' sparsified graphs
-    for src in graphs.keys():
-        if edge_retain_ratio < 1.0 and edge_retain_ratio > 0.0:
-            # remove (based on p-value) n edges where n = numedges*(1-edge_cutoff)
-            print('Removing weak edges..')
-            edges = G.edges(data=True)
-            sedges = sorted(edges,key=lambda x:x[2]['weight'])
-            keep_num = int(len(edges)*edge_retain_ratio)
-            remove_edges = [(x[0],x[1]) for x in sedges[-keep_num:]]
-            G.remove_edges_from(remove_edges)
-            num_edges = len(G.edges())
-            print('{}: {}% of edges retained: {} remain.'.format(src,int(num_edges/len(edges)*100),num_edges))
-            ofname = src + '_sparse.gexf'
-            print('Writing file {}\n'.format(ofname))
-            nx.write_gexf(G, results_folder + ofname)
-
-        else:
-            print('Retaining all edges.')
-
-    # visualization parameters
-    # cytoscape uses viz_size, viz_transparency, viz_color
-    # print('Applying visualization attributes.\n')
-    # for src in graphs.keys():
-    # eig_cent = nx.get_node_attributes(G,'eig_cent')
-    # viz_size = {n:v*200 for n,v in eig_cent.items()}
-    # nx.set_node_attributes(graphs[src],'viz_size', viz_size)
+def getfilenames(results_folder, model_extension, wf_extension):
+    # get model filenames
+    files = dict()
+    modelfiles, wordfreqfiles = list(), list()
+    for (dirpath, dirnames, filenames) in walk(results_folder):
+        for file in filenames:
+            if file[-len(model_extension):] == model_extension:
+                srcname = file.split('.')[0]
+                files[srcname] = dict()
+                files[srcname]['model'] = results_folder + file
+                files[srcname]['wordfreq'] = results_folder + srcname + wf_extension
+    return files

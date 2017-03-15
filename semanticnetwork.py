@@ -79,6 +79,7 @@ def build_semanticnetwork(
         for n in usenodes:
             if not n in model.vocab.keys():
                 raise(Exception('Not all usenodes are in the model dict.'))
+    usenodes = list(usenodes)
 
     # build graph
     if verbose: print('Building graph of {} nodes...'.format(len(usenodes)))
@@ -199,11 +200,12 @@ def sparsify_graph(
     return G
 
 
-def drop_edges(G,drop_attr,keep_largest=True,verbose=False):
+def drop_edges(G, drop_attr, keep_largest=True, verbose=False):
 
-    if keep_largest: desc = 'largest'
-    else: desc = 'smallest'
-    if verbose: print('Removing {} edges by {}..'.format(desc,drop_attr))
+    if verbose:
+        if keep_largest: desc = 'largest'
+        else: desc = 'smallest'
+        print('Removing {} edges by {}..'.format(desc,drop_attr))
     edges = G.edges(data=True)
     sedges = sorted(edges,key=lambda x:x[2][drop_attr])
     if keep_largest:
@@ -238,22 +240,8 @@ def drop_nodes(G,drop_attr, keep_largest=True, verbose=True):
 
 def common_set(vocabs):
     '''vocabs is a list of lists/sets'''
-    candidset = set()
-    for vocab in vocabs:
-        candidset |= vocab
-
-    removeset = set()
-    for word in candidset:
-        removeword = False
-        for vocab in vocabs:
-            if word not in vocab:
-                removeword = True
-        if removeword:
-            removeset.add(word)
-
-    # keep only words that appear in all vocabularies
-    return candidset - removeset
-
+    vsets = (set(v) for v in vocabs)
+    return functools.reduce(lambda x,y: x & y, vsets)
 
 
 if __name__ == '__main__':
