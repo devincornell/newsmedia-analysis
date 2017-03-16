@@ -258,6 +258,7 @@ if __name__ == '__main__':
         'verbose':True, 
         'nodeattrs': { 
             'eigcent': lambda x: nx.eigenvector_centrality(x,1000,tol=1e-4),
+            'wordfreq': lambda x: nx.eigenvector_centrality(x,1000,tol=1e-4),
             },
         'edgeattrs': {
             'weight': calc_edgeweights,

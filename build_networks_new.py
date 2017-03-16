@@ -9,7 +9,7 @@ from os import walk
 import numpy as np
 import pickle
 import sys
-
+import re
 import semanticnetwork as sn
 
 
@@ -31,8 +31,21 @@ def getfilenames(results_folder, model_extension, wf_extension):
     return files
 
 
+def getmftdict(file='Data/mft.dic'):
+    mftdict = dict()
+    with open(file, 'r') as f:
+        ignore = False
+        for line in f:
+            if line[0] == '%':
+                ignore = not ignore
+            elif not ignore and len(line.split()) > 0:
+                w = line.split()
+                mftdict[w[0]] = [int(x) for x in w[1:]]
+    return mftdict
+
 
 if __name__ == "__main__":
+    
     ## SETTINGS
     # file settings
     results_folder = 'results/'
@@ -47,7 +60,7 @@ if __name__ == "__main__":
     num_nodes_retained = 30 # number of most central nodes to keep
     sparsify_edges = False
     sparsify_retain_ratio = 0.3 # percentage of edges to keep
-    drop_edges = True
+    drop_edges = False
     fraction_edges_retained = 0.3 # percentage of edges to keep (after sparsifying, if nessecary)
  
 
@@ -77,10 +90,15 @@ if __name__ == "__main__":
     print()
 
     # look through each model to check vocab size
+    #mftdict = getmftdict()
+    #mft = {k:','.join((str(l) for l in v)) for k,v in mftdict.items()}
 
+    # start actually building graphs
     for src in files.keys():
         modelf = files[src]['model'] # shallow copy
         model = gensim.models.Word2Vec.load(modelf)
+        with open(files[src]['wordfreq'], 'rb') as f:
+            wf = pickle.load(f)
 
         print('Loaded model for {}.'.format(src))
 
@@ -88,9 +106,10 @@ if __name__ == "__main__":
         settings = {
             'model': model,
             'usenodes': nodeset, 
-            'verbose': True, 
-            'nodeattrs': { 
+            'verbose': True,
+            'nodeattrs': {
                 'eigcent': lambda x: nx.eigenvector_centrality(x,1000,tol=1e-4),
+                'wordfreq': lambda xG: {x:wf[x] for x in xG.nodes()},
                 },
             }
         G = sn.build_semanticnetwork(**settings)
