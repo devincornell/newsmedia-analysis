@@ -68,7 +68,7 @@ if __name__ == "__main__":
     wf_extension = '_wordfreq.pickle'
 
     # frequency settings
-    freq_cutoff = 50 # min number of appearances in each source for a word
+    freq_cutoff = 5 # min number of appearances in each source for a word
 
     # reduction/sparsification settings
     drop_nodes = False
