@@ -40,38 +40,26 @@ if __name__ == '__main__':
     folder = 'results/'
     extension = '.gexf'
     srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'nytimes']
-    testword = 'trump'
 
     mftscores = {s:{m:0 for m in mftnames.keys()} for s in srcnames}
-    print('Using testword', testword)
     for src in srcnames:
         print('Reading', src, 'graph.')
         G = nx.read_gexf(folder + src + extension)
-        print('Calculating av path len for each mft category..')
+        print('Calculating centrality for each mft category..')
         mftattr = nx.get_node_attributes(G, 'mft')
         mftmap = getmftnodes(mftattr)
         for moral,nodes in mftmap.items():
-            #print(mftnames[moral], 'has', len(nodes), 'nodes.')
             eigcent = nx.get_node_attributes(G,'eigcent')
-            eigcent = sorted(eigcent.items(), lambda (k,v): v)
-            print(eigcent[:10])
-            exit()
             for n in nodes:
-                pl = 0
-                pl = nx.shortest_path_length(G,testword,n,weight='dist')
-                try:
-                    pl = nx.shortest_path_length(G,testword,n,weight='dist')
-                except:
-                    pass
-                mftscores[src][moral] += pl
+                mftscores[src][moral] += eigcent[n]
             if len(nodes) > 0:
-                mftscores[src][moral] /= len(nodes) # av path len
+                mftscores[src][moral] /= len(nodes) # av eig centrality
 
         for moral,apl in mftscores[src].items():
             print(mftnames[moral], 'had apl', apl)
 
         print()
 
-    with open(folder + 'mftpaths_' + testword + '.pickle', 'wb') as f:
+    with open(folder + 'mftcentrality.pickle', 'wb') as f:
         pickle.dump(f)
 
