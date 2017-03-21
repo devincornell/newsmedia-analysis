@@ -2,6 +2,7 @@
 import networkx as nx
 import semanticnetwork as sn
 import math
+import pickle
 
 mftnames = {
     1: 'HarmVirtue',
@@ -70,5 +71,5 @@ if __name__ == '__main__':
         print()
 
     with open(folder + 'mftpaths_' + testword + '.pickle', 'wb') as f:
-        pickle.dump(f)
+        pickle.dump(mftscores,f)
 

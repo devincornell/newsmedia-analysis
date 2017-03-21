@@ -37,21 +37,11 @@ if __name__ == '__main__':
     for src in srcnames:
         print('Reading', src, 'graph.')
         G = nx.read_gexf(folder + src + extension)
-        print('Calculating centrality for each mft category..')
-        mftattr = nx.get_node_attributes(G, 'mft')
-        mftmap = getmftnodes(mftattr)
-        for moral,nodes in mftmap.items():
-            eigcent = nx.get_node_attributes(G,'eigcent')
-            for n in nodes:
-                mftscores[src][moral] += eigcent[n]
-            if len(nodes) > 0:
-                mftscores[src][moral] /= len(nodes) # av eig centrality
+        print('Calculating clusters..')
+        
+        #first compute the best partition
+        partitions = community.best_partition(G)
 
-        for moral,apl in mftscores[src].items():
-            print(mftnames[moral], 'had apl', apl)
-
-        print()
-
-    with open(folder + 'mftcentrality.pickle', 'wb') as f:
-        pickle.dump(mftscores,f)
+    with open(folder + 'cluster_partitions.pickle', 'wb') as f:
+        pickle.dump(partitions,f)
 
