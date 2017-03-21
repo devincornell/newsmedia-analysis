@@ -43,9 +43,30 @@ def getmftdict(file='Data/mft.dic'):
                 mftdict[w[0]] = [int(x) for x in w[1:]]
     return mftdict
 
+def getmftmatches(mftdict,words):
+    #mftdict = getmftdict()
+    #mft = {k:','.join((str(l) for l in v)) for k,v in mftdict.items()}
+    comp = [(re.compile(mstr),val) for mstr,val in mftdict.items()]
+    matches = dict()
+    for n in words:
+        for (matchre, val) in comp:
+            if matchre.match(n) is not None:
+                if len(val) > 1:
+                    matches[n] = ','.join(val)
+                else:
+                    matches[n] = str(val[0])
+                break
+    return matches
+
 
 if __name__ == "__main__":
     
+    mft = getmftdict()
+    words = ['safest', 'silly', 'goofy', 'killa', 'killers']
+    mat = getmftmatches(mft,words)
+    print(mat)
+    exit()
+
     ## SETTINGS
     # file settings
     results_folder = 'results/'
