@@ -26,15 +26,6 @@ def getmftnodes(nodeattr):
                 nodedict[m].append(n)
     return nodedict
 
-def vdiff(uv,vv):
-    return l2norm([u-v for u in uv for v in vv])
-
-def l2norm(listvec):
-    norm = 0
-    for v in listvec:
-        norm += v**2
-
-    return math.sqrt(norm)
 
 if __name__ == '__main__':
     folder = 'results/'
