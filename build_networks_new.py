@@ -52,7 +52,7 @@ def getmftmatches(mftdict,words):
         for (matchre, val) in comp:
             if matchre.match(n) is not None:
                 if len(val) > 1:
-                    matches[n] = ','.join(val)
+                    matches[n] = ','.join((str(v) for v in val))
                 else:
                     matches[n] = str(val[0])
                 break
@@ -60,12 +60,6 @@ def getmftmatches(mftdict,words):
 
 
 if __name__ == "__main__":
-    
-    mft = getmftdict()
-    words = ['safest', 'silly', 'goofy', 'killa', 'killers']
-    mat = getmftmatches(mft,words)
-    print(mat)
-    exit()
 
     ## SETTINGS
     # file settings
@@ -74,10 +68,10 @@ if __name__ == "__main__":
     wf_extension = '_wordfreq.pickle'
 
     # frequency settings
-    freq_cutoff = 5 # min number of appearances in each source for a word
+    freq_cutoff = 50 # min number of appearances in each source for a word
 
     # reduction/sparsification settings
-    drop_nodes = True
+    drop_nodes = False
     num_nodes_retained = 30 # number of most central nodes to keep
     sparsify_edges = False
     sparsify_retain_ratio = 0.3 # percentage of edges to keep
@@ -111,8 +105,8 @@ if __name__ == "__main__":
     print()
 
     # look through each model to check vocab size
-    #mftdict = getmftdict()
-    #mft = {k:','.join((str(l) for l in v)) for k,v in mftdict.items()}
+    mftdict = getmftdict()
+    mft = {k:','.join((str(l) for l in v)) for k,v in mftdict.items()}
 
     # start actually building graphs
     for src in files.keys():
@@ -129,8 +123,9 @@ if __name__ == "__main__":
             'usenodes': nodeset, 
             'verbose': True,
             'nodeattrs': {
-                'eigcent': lambda x: nx.eigenvector_centrality(x,1000,tol=1e-4),
+                'eigcent': lambda xG: nx.eigenvector_centrality(xG,1000,tol=1e-4),
                 'wordfreq': lambda xG: {x:wf[x] for x in xG.nodes()},
+                'mft': lambda xG: getmftmatches(mftdict, xG.nodes())
                 },
             }
         G = sn.build_semanticnetwork(**settings)
