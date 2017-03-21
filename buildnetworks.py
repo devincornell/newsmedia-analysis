@@ -47,16 +47,16 @@ def getmftmatches(mftdict,words):
     #mftdict = getmftdict()
     #mft = {k:','.join((str(l) for l in v)) for k,v in mftdict.items()}
     comp = [(re.compile(mstr),val) for mstr,val in mftdict.items()]
-    matches = dict()
+    matchcat = dict() # mft cat -> nodes
     for n in words:
         for (matchre, val) in comp:
             if matchre.match(n) is not None:
                 if len(val) > 1:
-                    matches[n] = ','.join((str(v) for v in val))
+                    matchcat[n] = ','.join((str(v) for v in val))
                 else:
-                    matches[n] = str(val[0])
+                    matchcat[n] = str(val[0])
                 break
-    return matches
+    return matchcat
 
 
 if __name__ == "__main__":
@@ -96,17 +96,17 @@ if __name__ == "__main__":
             wf = pickle.load(f)
         print('found', len(wf.keys()), 'words.')
         wordfreqs.append([w for w in wf.keys() if wf[w] > freq_cutoff])
-
     
     # find common set of words in each reduced vocabulary
     print('Finding common set of words.')
     nodeset = sn.common_set(wordfreqs)
     print('Keeping {} nodes appear at least {} times in all sources.'.format(len(nodeset), freq_cutoff))
-    print()
-
+    
     # look through each model to check vocab size
     mftdict = getmftdict()
-    mft = {k:','.join((str(l) for l in v)) for k,v in mftdict.items()}
+    mftmatches = getmftmatches(mftdict,nodeset)
+    print('total of', len(mftmatches.keys()), 'mft words found.')
+    print()
 
     # start actually building graphs
     for src in files.keys():
@@ -125,7 +125,7 @@ if __name__ == "__main__":
             'nodeattrs': {
                 'eigcent': lambda xG: nx.eigenvector_centrality(xG,1000,tol=1e-4),
                 'wordfreq': lambda xG: {x:wf[x] for x in xG.nodes()},
-                'mft': lambda xG: getmftmatches(mftdict, xG.nodes())
+                'mft': lambda xG: mftmatches,
                 },
             }
         G = sn.build_semanticnetwork(**settings)
@@ -134,7 +134,6 @@ if __name__ == "__main__":
         if drop_nodes:
             print('Now removing nodes that are least central: keeping {} nodes.'.format(num_nodes_retained))
             G = sn.drop_nodes(G,'eigcent', number=num_nodes_retained, keep_largest=True, verbose=True)
-
 
         if sparsify_edges:
             print('Now sparsifying edges..')
@@ -154,5 +153,5 @@ if __name__ == "__main__":
             G = sn.drop_edges(G,'weight', fraction=fraction_edges_retained, keep_largest=True, verbose=True)
 
         print('Writing file..')
-        nx.write_gexf(G, results_folder + src + '_sparse.gexf')
+        nx.write_gexf(G, results_folder + src + '.gexf')
         print()
