@@ -30,12 +30,12 @@ def getmftnodes(nodeattr):
 
 if __name__ == '__main__':
     folder = 'results/'
-    extension = '.gexf'
-    srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'huffpo', 'nytimes', 'reuters', 'usatoday', 'wapo', 'watimes']
+    extension = '_full.gexf'
+    srcnames = ['nytimes', 'breitbart', 'cbsnews', 'cnn', 'foxnews', 'huffpo', 'reuters', 'usatoday', 'wapo', 'watimes']
 
     mftscores = {s:{m:0 for m in mftnames.keys()} for s in srcnames}
     for src in srcnames:
-        print('Reading', src, 'graph.')
+        print('Reading', src + extension)
         G = nx.read_gexf(folder + src + extension)
         print('Calculating centrality for each mft category..')
         mftattr = nx.get_node_attributes(G, 'mft')

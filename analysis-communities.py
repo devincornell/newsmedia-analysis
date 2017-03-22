@@ -11,8 +11,8 @@ if __name__ == '__main__':
     # this script uses the community library
     # http://perso.crans.org/aynaud/communities/api.html
     folder = 'results/'
-    extension = '.gexf'
-    srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'nytimes']
+    extension = '_full.gexf'
+    srcnames = ['nytimes', 'breitbart', 'cbsnews', 'cnn', 'foxnews', 'huffpo', 'reuters', 'usatoday', 'wapo', 'watimes']
     res = 0.8
 
     partitions = dict()

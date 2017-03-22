@@ -74,10 +74,10 @@ if __name__ == "__main__":
     # reduction/sparsification settings
     drop_nodes = False
     num_nodes_retained = 30 # number of most central nodes to keep
-    sparsify_edges = True
+    sparsify_edges = False
     sparsify_retain_ratio = 0.3 # percentage of edges to keep
     drop_edges = False
-    fraction_edges_retained = 0.1 # percentage of edges to keep (after sparsifying, if nessecary)
+    fraction_edges_retained = 0.5 # percentage of edges to keep (after sparsifying, if nessecary)
  
 
     ## CODE STARTS
@@ -173,5 +173,5 @@ if __name__ == "__main__":
             G = sn.drop_edges(G,'weight', fraction=fraction_edges_retained, keep_largest=True, verbose=True)
 
         print('Writing file..')
-        nx.write_gexf(G, results_folder + src + '.gexf')
+        nx.write_gexf(G, results_folder + src + '_sparse.gexf')
         print()

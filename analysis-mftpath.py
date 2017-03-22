@@ -40,8 +40,8 @@ def l2norm(listvec):
 
 if __name__ == '__main__':
     folder = 'results/'
-    extension = '.gexf'
-    srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'huffpo', 'nytimes', 'reuters', 'usatoday', 'wapo', 'watimes']
+    extension = '_full.gexf'
+    srcnames = ['nytimes', 'breitbart', 'cbsnews', 'cnn', 'foxnews', 'huffpo', 'reuters', 'usatoday', 'wapo', 'watimes']
     testword = 'trump'
 
     mftscores = {s:{m:0 for m in mftnames.keys()} for s in srcnames}
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             #print(mftnames[moral], 'has', len(nodes), 'nodes.')
             for n in nodes:
                 pl = 0
-                pl = nx.shortest_path_length(G,testword,n,weight='dist')
+                #pl = nx.shortest_path_length(G,testword,n,weight='dist')
                 try:
                     pl = nx.shortest_path_length(G,testword,n,weight='dist')
                 except:
