@@ -11,7 +11,8 @@ import pickle
 import sys
 import re
 import semanticnetwork as sn
-
+import functools
+import itertools
 
 
 
@@ -68,15 +69,15 @@ if __name__ == "__main__":
     wf_extension = '_wordfreq.pickle'
 
     # frequency settings
-    freq_cutoff = 5 # min number of appearances in each source for a word
+    freq_cutoff = 10 # min number of appearances in each source for a word
 
     # reduction/sparsification settings
     drop_nodes = False
     num_nodes_retained = 30 # number of most central nodes to keep
     sparsify_edges = False
     sparsify_retain_ratio = 0.3 # percentage of edges to keep
-    drop_edges = False
-    fraction_edges_retained = 0.3 # percentage of edges to keep (after sparsifying, if nessecary)
+    drop_edges = True
+    fraction_edges_retained = 0.1 # percentage of edges to keep (after sparsifying, if nessecary)
  
 
     ## CODE STARTS
@@ -90,16 +91,35 @@ if __name__ == "__main__":
 
     # load wordfreq files to decide which nodes to use
     wordfreqs = list()
+    srcvocabs = dict()
     for src in files.keys():
         print(files[src]['wordfreq'])
         with open(files[src]['wordfreq'], 'rb') as f:
             wf = pickle.load(f)
         print('found', len(wf.keys()), 'words.')
-        wordfreqs.append([w for w in wf.keys() if wf[w] > freq_cutoff])
+        wordfreqs.append({w for w in wf.keys() if wf[w] > freq_cutoff})
+        srcvocabs[src] = list(wf.keys())
+
+    for src in files.keys():
+        print(files[src]['wordfreq'])
+        with open(files[src]['wordfreq'], 'rb') as f:
+            wf = pickle.load(f)
+
     
     # find common set of words in each reduced vocabulary
     print('Finding common set of words.')
-    nodeset = sn.common_set(wordfreqs)
+    #nodeset = sn.common_set(wordfreqs)
+    candidset = functools.reduce(lambda x,y: x | y, wordfreqs)
+
+    # remove words that don't appear in all sources
+    removeset = set()
+    for w in candidset:
+        for src,wv in srcvocabs.items():
+            if w not in wv:
+                removeset.add(w)
+    print(len(removeset))
+    nodeset = list(candidset - removeset)
+
     print('Keeping {} nodes appear at least {} times in all sources.'.format(len(nodeset), freq_cutoff))
     
     # look through each model to check vocab size

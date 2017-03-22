@@ -6,11 +6,14 @@ import pickle
 import community
 
 if __name__ == '__main__':
+
+    print(dir(community.best_partition))
     # this script uses the community library
     # http://perso.crans.org/aynaud/communities/api.html
     folder = 'results/'
     extension = '.gexf'
     srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'nytimes']
+    res = 0.8
 
     partitions = dict()
     for src in srcnames:
@@ -18,7 +21,7 @@ if __name__ == '__main__':
         G = nx.read_gexf(folder + src + extension)
         
         print('Calculating clusters..')
-        partitions[src] = community.best_partition(G)
+        partitions[src] = community.best_partition(G, resolution=res)
         print()
 
     print('Saving files..')

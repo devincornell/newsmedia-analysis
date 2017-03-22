@@ -6,14 +6,10 @@ import nltk
 import nltk.corpus
 from nltk.stem.wordnet import WordNetLemmatizer
 import pickle
-import matplotlib.pyplot as pp
 import pprint
 import re
 
 punctlist = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '``']
-
-pp.style.use('ggplot')
-ptprint = (pprint.PrettyPrinter(indent=3))
 
 def remove_specialchars(paragraph,stopwords,specialchars):
     newpar = [w for w in paragraph if w not in stopwords]
@@ -83,8 +79,10 @@ if __name__ == "__main__":
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_par), srcname))
         print("Training model on {}".format(srcname))
-        model = gensim.models.Word2Vec(src_par, size=num_dim,workers=6)
+        model = gensim.models.Word2Vec(src_par, size=num_dim,workers=6, min_count=3)
         print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
+
+        freq_dist = {w:f for (w,f) in freq_dist.items() if w in model.vocab}
 
         # save model and word frequency count
         print('Saving {}.wtvmodel and {}_wordfreq.pickle'.format(srcname, srcname))
