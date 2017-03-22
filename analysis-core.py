@@ -3,6 +3,8 @@ from os import walk
 import itertools
 import functools
 import pickle
+import networkx as nx
+import semanticnetwork as sn
 
 srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'nytimes']
 
@@ -12,12 +14,12 @@ if __name__ == "__main__":
     extension = '.gexf'
     num_nodes_retained = 20
 
-    fnames = [folder + sn + extension for sn in sourcenames]
+    fnames = [folder + sn + extension for sn in srcnames]
 
     ## Look at sparse graphs to get top nodes
     nodesets = set()
     for src,fname in zip(srcnames,fnames):
-        print('Loading network', fname)
+        print('Loading network', src)
         G = nx.read_gexf(fname)
 
         print('Now removing nodes that are least central: keeping {}', num_nodes_retained)
