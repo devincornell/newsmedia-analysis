@@ -74,9 +74,9 @@ if __name__ == "__main__":
     # reduction/sparsification settings
     drop_nodes = False
     num_nodes_retained = 30 # number of most central nodes to keep
-    sparsify_edges = False
+    sparsify_edges = True
     sparsify_retain_ratio = 0.3 # percentage of edges to keep
-    drop_edges = True
+    drop_edges = False
     fraction_edges_retained = 0.1 # percentage of edges to keep (after sparsifying, if nessecary)
  
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
             'usenodes': nodeset, 
             'verbose': True,
             'nodeattrs': {
-                'eigcent': lambda xG: nx.eigenvector_centrality(xG,1000,tol=1e-4),
+                'eigcent': lambda xG: nx.eigenvector_centrality(xG,10000,tol=1e-3),
                 'wordfreq': lambda xG: {x:wf[x] for x in xG.nodes()},
                 'mft': lambda xG: mftmatches,
                 },
