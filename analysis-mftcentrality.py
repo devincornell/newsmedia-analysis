@@ -31,7 +31,7 @@ def getmftnodes(nodeattr):
 if __name__ == '__main__':
     folder = 'results/'
     extension = '.gexf'
-    srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'nytimes']
+    srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'huffpo', 'nytimes', 'reuters', 'usatoday', 'wapo', 'watimes']
 
     mftscores = {s:{m:0 for m in mftnames.keys()} for s in srcnames}
     for src in srcnames:

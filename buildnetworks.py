@@ -69,7 +69,7 @@ if __name__ == "__main__":
     wf_extension = '_wordfreq.pickle'
 
     # frequency settings
-    freq_cutoff = 10 # min number of appearances in each source for a word
+    freq_cutoff = 30 # min number of appearances in each source for a word
 
     # reduction/sparsification settings
     drop_nodes = False
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     print(len(removeset))
     nodeset = list(candidset - removeset)
 
-    print('Keeping {} nodes appear at least {} times in all sources.'.format(len(nodeset), freq_cutoff))
+    print('Keeping {} nodes appear at least {} times in any source.'.format(len(nodeset), freq_cutoff))
     
     # look through each model to check vocab size
     mftdict = getmftdict()

@@ -41,7 +41,7 @@ def l2norm(listvec):
 if __name__ == '__main__':
     folder = 'results/'
     extension = '.gexf'
-    srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'nytimes']
+    srcnames = ['breitbart', 'cbsnews', 'cnn', 'foxnews', 'huffpo', 'nytimes', 'reuters', 'usatoday', 'wapo', 'watimes']
     testword = 'trump'
 
     mftscores = {s:{m:0 for m in mftnames.keys()} for s in srcnames}
