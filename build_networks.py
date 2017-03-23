@@ -9,7 +9,7 @@ from os import walk
 import numpy as np
 import pickle
 import sys
-import sparsify
+#import sparsify
 
 # calculates relation dictionary (as edge attributes) between every word pair
 def get_relations(u_vec, v_vec):
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     srcvocabs = list()
     for src,dat in models.items():
         candidset |= set([x[0] for x in dat['wordfreq'].most_common(n)])
-        srcvocabs.append(set(dat['model'].vocab.keys()))
+        srcvocabs.append(set(dat['model'].wv.vocab.keys()))
 
     # remove words that don't appear in all sources
     removeset = set()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     graphs = dict()
     for src, dat in models.items():
         print(src)
-        srcvocab = set(dat['model'].vocab.keys())
+        srcvocab = set(dat['model'].wv.vocab.keys())
         print('Building {} graph...'.format(src))
         
         G = nx.Graph()

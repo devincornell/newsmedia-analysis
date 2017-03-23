@@ -12,7 +12,7 @@ def nmf_idf_model(samples):
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.decomposition import NMF
     n_features = 10000
-    n_topics = 25
+    n_topics = 15
     tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=n_features, stop_words='english')
     tfidf = tfidf_vectorizer.fit_transform(samples)
     tfidf_feature_names = tfidf_vectorizer.get_feature_names()

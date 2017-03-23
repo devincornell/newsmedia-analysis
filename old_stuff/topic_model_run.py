@@ -4,7 +4,7 @@ import json
 from old_stuff.topic_model import *
 
 data = {}
-with open('/Users/jacobfisher/PycharmProjects/newsmedia-analysis/Data/postprocessed_data.json', 'r') as infile:
+with open('/Users/jacobfisher/PycharmProjects/newsmedia-analysis/Data/scraped_articles_breitbart.json', 'r') as infile:
     for k,v in json.load(infile).items():
         data[k] = v
 

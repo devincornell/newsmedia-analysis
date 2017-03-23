@@ -124,4 +124,4 @@ if __name__ == "__main__":
         model.save('{}{}_nouns.wtvmodel'.format(results_folder,srcname))
         with open(results_folder + srcname + '_nounfreq.pickle','wb') as f:
             pickle.dump(freq_dist, f)
-        print()
+        print("-" * 20)

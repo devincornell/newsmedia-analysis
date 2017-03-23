@@ -26,7 +26,7 @@ for i, srcfile in enumerate(sources):
     plt.subplot(4, 4, i+1)
 
     s = pd.Series(list(wordfreq.values()), index=list(wordfreq.keys()))
-    s.sort_values(ascending=False)[:10].plot(kind='bar')
+    s.sort_values(ascending=False)[:10].plot(kind='bar', title=srcfile, grid=True)
 
     plt.title(srcfile)
     plt.suptitle('Word Frequencies')
