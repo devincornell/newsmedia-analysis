@@ -35,8 +35,8 @@ def get_source_data(fname,verbose=False):
 if __name__ == "__main__":
 
     # script params
-    results_folder = 'results/'
-    num_dim = 50
+    results_folder = 'results/wtvmodel/'
+    num_dim = 100
     specialchars = ["'",'"',',','.','&']
 
     sources = {
@@ -73,20 +73,13 @@ if __name__ == "__main__":
         # remove stopwords
         src_par = [[w for w in par if w not in stopwords and w.isalnum()] for par in src_par]
 
-        # # calculate frequency information for each word
-        freq_dist = nltk.FreqDist([w for s in src_par for w in s])
-
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_par), srcname))
         print("Training model on {}".format(srcname))
-        model = gensim.models.Word2Vec(src_par, size=num_dim,workers=6, min_count=3)
-        print('{} contains {} words.'.format(srcname,len(set(model.vocab.keys()))))
-
-        freq_dist = {w:f for (w,f) in freq_dist.items() if w in model.vocab}
+        model = gensim.models.Word2Vec(src_par, size=num_dim,workers=8, min_count=3)
+        print('{} contains {} unique words.'.format(srcname,len(model.wv.vocab)))
 
         # save model and word frequency count
-        print('Saving {}.wtvmodel and {}_wordfreq.pickle'.format(srcname, srcname))
-        model.save('{}{}.wtvmodel'.format(results_folder,srcname))
-        with open(results_folder + srcname + '_wordfreq.pickle','wb') as f:
-            pickle.dump(freq_dist, f)
+        print('Saving {}.wtvmodel'.format(srcname))
+        model.save('{}{}_pars.wtvmodel'.format(results_folder,srcname))
         print()
