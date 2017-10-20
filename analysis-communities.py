@@ -21,7 +21,7 @@ if __name__ == '__main__':
         G = nx.read_gexf(folder + src + extension)
         
         print('Calculating clusters..')
-        partitions[src] = community.best_partition(G, resolution=res)
+        partitions[src] = community.best_partition(G)
         print()
 
     print('Saving files..')

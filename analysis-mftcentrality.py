@@ -41,7 +41,8 @@ if __name__ == '__main__':
         mftattr = nx.get_node_attributes(G, 'mft')
         mftmap = getmftnodes(mftattr)
         for moral,nodes in mftmap.items():
-            eigcent = nx.get_node_attributes(G,'eigcent')
+            #eigcent = nx.get_node_attributes(G,'eigcent')
+            eigcent = nx.eigenvector_centrality(G,8000000,tol=1e-2)
             for n in nodes:
                 mftscores[src][moral] += eigcent[n]
             if len(nodes) > 0:
