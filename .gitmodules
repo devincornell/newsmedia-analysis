@@ -1,3 +1,6 @@
 [submodule "word2vec"]
 	path = word2vec
 	url = https://github.com/devincornell/word2vec
+[submodule "semanticanalysis"]
+	path = semanticanalysis
+	url = https://github.com/devincornell/semanticanalysis.git
