@@ -80,6 +80,6 @@ if __name__ == "__main__":
         print('{} contains {} unique words.'.format(srcname,len(model.wv.vocab)))
 
         # save model and word frequency count
-        print('Saving {}.wtvmodel'.format(srcname))
+        print('Saving {}_pars.wtvmodel'.format(srcname))
         model.save('{}{}_pars.wtvmodel'.format(results_folder,srcname))
         print()
