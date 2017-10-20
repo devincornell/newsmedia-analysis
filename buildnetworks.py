@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     ## SETTINGS
     # file settings
-    results_folder = 'results/'
+    models_folder = 'results/wtvmodels/'
     model_extension = '.wtvmodel'
     wf_extension = '_wordfreq.pickle'
 
