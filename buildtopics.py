@@ -69,10 +69,9 @@ if __name__ == "__main__":
     files = getfilenames(models_folder, model_extension)
     print('found {} files.'.format(len(files)))
     
-    #with p as Pool(len(files)):
-    #    p.map(savematrix, list(files.items()))
-    
-    srces = list(map(savematrix, list(files.items())))
+    with p as Pool(len(files)):
+        srces = list(p.map(savematrix, list(files.items())))
+    #srces = list(map(savematrix, list(files.items())))
     
     print('done with all:', srces)
     #files = {'cbsnews_pars':files['cbsnews_pars'],}
