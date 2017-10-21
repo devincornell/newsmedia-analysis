@@ -69,7 +69,7 @@ if __name__ == "__main__":
     files = getfilenames(models_folder, model_extension)
     print('found {} files.'.format(len(files)))
     
-    with p as Pool(len(files)):
+    with Pool(len(files)) as p:
         srces = list(p.map(savematrix, list(files.items())))
     #srces = list(map(savematrix, list(files.items())))
     
