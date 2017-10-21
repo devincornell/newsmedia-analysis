@@ -35,7 +35,7 @@ def get_source_data(fname,verbose=False):
 if __name__ == "__main__":
 
     # script params
-    results_folder = 'results/wtvmodel/'
+    results_folder = 'results/wtvmodels/'
     num_dim = 100
     specialchars = ["'",'"',',','.','&']
 
