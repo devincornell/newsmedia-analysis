@@ -1,0 +1,24 @@
+
+russia probe
+election
+appointment of surpeme court judge
+appointment of betsy devoss
+
+1. choose entity
+2. list of words related to that entity
+3. sentiment analysis (word bank, wordnet)
+
+use to come up with how an entity is framed within a particular context
+- word list using RWR (distribution over words)
+- sentiment analysis (using wordlist)
+- topic tracking
+
+-compare across source
+
+Framing Perspectives
+- types of words associated with a given entity (word list)
+- sentiment attached to an entity (sentiw-ordnet)
+- types of issues that are associated with an entity across time (topic modeling)
+
+
+This method from NS is useful for uncovering framing in multiple different ways. Rely on latent network structure of text.

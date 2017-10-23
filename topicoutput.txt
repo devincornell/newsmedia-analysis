@@ -1,0 +1,199 @@
+found 10 files.
+wapo_pars
+using 19140 words for matrix.
+17 partitions.
+(19140, 19140)
+0
+0.0
+['steam', 'procedure', 'intensity', 'ball', 'schuster', 'compatible', 'jazz', 'trap', 'rumors', 'crown']
+
+0.1
+['trump', 'smear', 'affinity', 'enthusiasm', 'sharp', 'chopped', 'animated', 'olive', 'assertion', 'disturbing']
+
+0.2
+['trump', 'divisive', 'manifesto', 'affinity', 'libertarian', 'fillon', 'hofer', 'raucous', 'austria', 'confront']
+
+0.3
+['trump', 'crooked', 'congratulated', 'unrelatedly', 'raucous', 'libertarian', 'manifesto', 'divisive', 'alighted', 'dismissively']
+
+0.4
+['trump', 'crooked', 'trail', 'unrelatedly', 'consolidating', 'francois', 'address', 'rescind', 'congratulated', 'interference']
+
+0.5
+['trump', 'vladimir', 'trail', 'crooked', 'consolidating', 'unrelatedly', 'interference', 'electability', 'francois', 'trailing']
+
+0.6
+['trump', 'vladimir', 'consolidating', 'trail', 'trailing', 'crooked', 'incoming', 'presidential', 'putin', 'interference']
+
+0.7
+['trump', 'vladimir', 'presidential', 'trailing', 'clinton', 'putin', 'incoming', 'consolidating', 'trail', 'campaign']
+
+0.8
+['trump', 'vladimir', 'presidential', 'clinton', 'trailing', 'putin', 'campaign', 'incoming', 'consolidating', 'trail']
+
+0.9
+['trump', 'vladimir', 'clinton', 'presidential', 'campaign', 'putin', 'trailing', 'incoming', 'consolidating', 'trail']
+
+0.99
+['trump', 'vladimir', 'clinton', 'presidential', 'campaign', 'putin', 'trailing', 'incoming', 'consolidating', '45th']
+
+[('vladimir', 0.8086456656455994), ('clinton', 0.7921964526176453), ('presidential', 0.7873239517211914), ('campaign', 0.7705333232879639), ('putin', 0.7607196569442749), ('trailing', 0.7550322413444519), ('incoming', 0.7515382766723633), ('consolidating', 0.733811616897583), ('45th', 0.730797290802002), ('trail', 0.7282321453094482)]
+cbsnews_pars
+using 6848 words for matrix.
+16 partitions.
+(6848, 6848)
+0
+0.0
+['even', 'one', 'also', 'used', 'could', 'help', 'may', 'attack', 'back', 'still']
+
+0.1
+['trump', 'even', 'also', 'one', 'may', 'first', 'help', 'since', 'much', 'attack']
+
+0.2
+['trump', 'first', 'even', 'may', 'also', 'one', 'since', 'much', 'several', 'attack']
+
+0.3
+['trump', 'trumps', 'first', 'even', 'may', 'also', 'campaign', 'since', 'several', 'much']
+
+0.4
+['trump', 'trumps', 'campaign', 'first', 'republican', 'day', 'even', 'may', 'election', 'also']
+
+0.5
+['trump', 'trumps', 'campaign', 'republican', 'election', 'first', 'day', 'officials', 'may', 'even']
+
+0.6
+['trump', 'trumps', 'campaign', 'republican', 'election', 'day', 'first', 'presidential', 'officials', 'put']
+
+0.7
+['trump', 'trumps', 'campaign', 'republican', 'election', 'presidential', 'day', 'first', 'obama', 'clinton']
+
+0.8
+['trump', 'trumps', 'presidential', 'republican', 'election', 'campaign', 'day', 'obama', 'clinton', 'first']
+
+0.9
+['trump', 'trumps', 'presidential', 'election', 'republican', 'campaign', 'obama', 'day', 'clinton', 'president']
+
+0.99
+['trump', 'trumps', 'presidential', 'election', 'republican', 'campaign', 'obama', 'clinton', 'day', 'president']
+
+[('trumps', 0.9999337196350098), ('presidential', 0.9998843669891357), ('election', 0.9998729228973389), ('republican', 0.9998705387115479), ('campaign', 0.9998683929443359), ('obama', 0.9998542070388794), ('clinton', 0.9998521208763123), ('day', 0.9998491406440735), ('president', 0.999847412109375), ('candidate', 0.9998385906219482)]
+huffpo_pars
+using 18849 words for matrix.
+17 partitions.
+(18849, 18849)
+0
+0.0
+['identicaltriplets', 'growingupgerber', 'identicaltwins', 'munamommy', 'trippinwith3', 'preemie', 'tripletsmother', 'blackmomsblog', 'pascal', 'bata']
+
+0.1
+['trump', 'congratulations', 'populace', 'embodies', 'covert', 'worsen', 'trail', 'pronounced', 'initiate', 'succeeds']
+
+0.2
+['trump', 'boon', 'delighted', 'denounce', 'belligerence', 'trail', 'perverse', 'mogul', 'ripping', 'antithesis']
+
+0.3
+['trump', 'boon', '306', 'belligerence', 'mailers', 'robocalls', 'despise', 'delighted', 'custer', 'kaine']
+
+0.4
+['trump', 'despise', 'custer', 'boon', 'mailers', 'flashpoint', 'robocalls', '306', 'concession', 'marketer']
+
+0.5
+['trump', 'despise', 'custer', 'flashpoint', 'vladimir', 'mailers', 'robocalls', 'boon', 'vulgar', 'incites']
+
+0.6
+['trump', 'despise', 'custer', 'flashpoint', 'vladimir', 'vulgar', 'candidate', 'mailers', 'hillary', 'undecided']
+
+0.7
+['trump', 'despise', 'custer', 'flashpoint', 'vladimir', 'vulgar', 'hillary', 'candidate', 'clinton', 'obama']
+
+0.8
+['trump', 'despise', 'hillary', 'obama', 'clinton', 'candidate', 'vulgar', 'vladimir', 'flashpoint', 'custer']
+
+0.9
+['trump', 'obama', 'clinton', 'hillary', 'despise', 'candidate', 'vulgar', 'vladimir', 'flashpoint', 'custer']
+
+0.99
+['trump', 'obama', 'clinton', 'hillary', 'despise', 'candidate', 'vulgar', 'vladimir', 'flashpoint', 'custer']
+
+[('obama', 0.7768328189849854), ('clinton', 0.7704392671585083), ('hillary', 0.7667102813720703), ('despise', 0.7564001679420471), ('candidate', 0.7546604871749878), ('vulgar', 0.7475408315658569), ('vladimir', 0.7419712543487549), ('flashpoint', 0.7372126579284668), ('custer', 0.7345248460769653), ('presidential', 0.7284998893737793)]
+nytimes_pars
+using 18960 words for matrix.
+16 partitions.
+(18960, 18960)
+0
+0.0
+['planted', 'bold', 'gradually', 'williams', 'victor', 'severe', 'complete', 'attached', 'entirely', 'representation']
+
+0.1
+['trump', 'eager', 'electoral', 'alarming', 'racist', 'embarrassment', 'mate', 'fed', 'asks', 'realm']
+
+0.2
+['trump', 'believing', 'richman', 'duterte', 'conway', 'pledge', 'mauricio', 'normalize', 'outcome', 'trail']
+
+0.3
+['trump', 'richman', 'admirable', 'believing', 'candidate', 'departing', 'whorton', 'prepares', 'elected', 'muhammadu']
+
+0.4
+['trump', 'admirable', 'muhammadu', 'whorton', 'elected', 'richman', 'departing', 'democrats', 'candidate', 'coolidge']
+
+0.5
+['trump', 'admirable', 'clinton', 'incoming', 'hillary', 'muhammadu', 'whorton', 'elected', '45th', 'democrats']
+
+0.6
+['trump', 'clinton', 'hillary', 'admirable', 'incoming', '45th', 'bush', 'muhammadu', 'elected', 'democrats']
+
+0.7
+['trump', 'clinton', 'hillary', 'obama', 'admirable', 'incoming', 'bush', '45th', 'vice', 'muhammadu']
+
+0.8
+['trump', 'clinton', 'hillary', 'obama', 'admirable', 'incoming', 'bush', 'vice', 'presidential', '45th']
+
+0.9
+['trump', 'clinton', 'obama', 'hillary', 'nan', 'incoming', 'bush', 'admirable', 'presidential', 'vice']
+
+0.99
+['trump', 'clinton', 'obama', 'hillary', 'nan', 'bush', 'incoming', 'presidential', 'admirable', 'campaign']
+
+[('clinton', 0.903407096862793), ('obama', 0.8716951608657837), ('hillary', 0.8574954271316528), ('nan', 0.8191274404525757), ('bush', 0.7961772680282593), ('incoming', 0.79395991563797), ('presidential', 0.7919617891311646), ('admirable', 0.7892877459526062), ('campaign', 0.7890496253967285), ('election', 0.7853476405143738)]
+reuters_pars
+using 18571 words for matrix.
+17 partitions.
+(18571, 18571)
+0
+0.0
+['ammo', 'rica', 'keidan', 'lingen', 'unnecessary', 'pink', 'fruits', 'super', 'preaching', 'vitamin']
+
+0.1
+['trump', 'mixed', 'cool', 'root', 'exam', 'celebrity', 'repair', 'conspiracy', 'thrown', 'fairbanks']
+
+0.2
+['trump', 'rocky', 'swamp', 'tweeting', 'priorities', 'delegate', 'choices', 'divisive', 'trumps', 'depended']
+
+0.3
+['trump', 'swamp', 'rocky', 'themes', 'divisive', 'demeaning', 'trail', 'delegate', 'outspoken', 'giancarlo']
+
+0.4
+['trump', 'swamp', 'trail', 'rocky', 'demeaning', 'themes', 'rescind', 'wasnt', 'harshly', 'messenger']
+
+0.5
+['trump', 'trail', 'wasnt', 'rescind', 'swamp', 'demeaning', 'languishes', 'candidates', 'themes', 'revisit']
+
+0.6
+['trump', 'trail', 'wasnt', 'rescind', 'languishes', 'demeaning', 'revisit', 'candidates', 'swamp', 'fillon']
+
+0.7
+['trump', 'wasnt', 'trail', 'rescind', 'languishes', 'revisit', 'candidates', 'fillon', 'demeaning', 'congressional']
+
+0.8
+['trump', 'wasnt', 'trail', 'rescind', 'upended', 'languishes', 'revisit', 'congressional', 'candidates', 'fillon']
+
+0.9
+['trump', 'wasnt', 'trail', 'rescind', 'upended', 'congress', 'congressional', 'republican', 'languishes', 'presidential']
+
+0.99
+['trump', 'wasnt', 'trail', 'upended', 'rescind', 'congress', 'republican', 'presidential', 'congressional', 'election']
+
+[('wasnt', 0.738090455532074), ('trail', 0.722354531288147), ('upended', 0.712552547454834), ('rescind', 0.7018722891807556), ('congress', 0.7007264494895935), ('republican', 0.6983947157859802), ('presidential', 0.6952029466629028), ('congressional', 0.6943048238754272), ('election', 0.6902053356170654), ('obama', 0.6876111626625061)]
+breitbart_pars
+using 9328 words for matrix.
+16 partitions.
