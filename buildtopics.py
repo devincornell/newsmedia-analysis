@@ -61,14 +61,6 @@ if __name__ == "__main__":
             pickle.dump(S, f)
             
         print(src, 'now done.')
-        
-        #for p in [i/10 for i in range(10)]+[0.99,]:
-            #topic = sa.centralized_randomwalk('trump', matrix=S, returnprob=p, max_iter=1000)
-            #print(p)
-            #print([t[0] for t in topic[:10]])
-            #print()
-            
-        #print(model.most_similar('trump',topn=10))    
     
     print('ddfd')
     
