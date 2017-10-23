@@ -71,6 +71,7 @@ if __name__ == "__main__":
     
     #with p as Pool(len(files)):
     #    srces = list(p.map(savematrix, list(files.items())))
+
     #srces = list(map(savematrix, list(files.items())))
     files = {'cnn_pars':files['cnn_pars']}
     for src, fname in files.items():
