@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     ## SETTINGS
     # file settings
-    models_folder = 'results/wtvmodels/'
+    models_folder = 'results/wtvmodels_big/'
     matrix_folder = 'results/mat/'
     
     model_extension = '.wtvmodel'
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         print(src)
         model = gensim.models.Word2Vec.load(fname)
         usenodes = list(model.wv.vocab.keys())
-        #usenodes = [w for w in model.wv.vocab.keys() if model.wv.vocab[w].count > 50]
+        #usenodes = [w for w in model.wv.vocab.keys() if model.wv.vocab[w].count > 30]
         print('using {} words for matrix.'.format(len(usenodes)))
         S = sa.build_semanticmatrix(model, usenodes, verbose=True, workers=workers)
         print('built matrix for', src)

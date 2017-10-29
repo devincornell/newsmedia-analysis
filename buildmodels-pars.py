@@ -35,7 +35,7 @@ def get_source_data(fname,verbose=False):
 if __name__ == "__main__":
 
     # script params
-    results_folder = 'results/wtvmodels/'
+    results_folder = 'results/wtvmodels_big/'
     num_dim = 100
     specialchars = ["'",'"',',','.','&']
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_par), srcname))
         print("Training model on {}".format(srcname))
-        model = gensim.models.Word2Vec(src_par, size=num_dim,workers=8, min_count=3)
+        model = gensim.models.Word2Vec(src_par, size=num_dim, workers=8, min_count=2, sg=1)
         print('{} contains {} unique words.'.format(srcname,len(model.wv.vocab)))
 
         # save model and word frequency count
