@@ -13,6 +13,7 @@ from multiprocessing import Pool
 import sys
 import pickle
 from nltk.corpus import sentiwordnet as swn
+from scipy.stats.stats import pearsonr   
 
 
 
@@ -28,23 +29,20 @@ def getfilenames(folder, file_extension):
     return files
 
 
-scale = 100
-matf = getfilenames('results/mat_small/','.mat')
-modelf = getfilenames('results/wtvmodels/','.wtvmodel')
+scale = 10
+matf = getfilenames('results/mat_medium10/','.hdf')
 folder = 'results/srcnets/'
-words = ['clinton', 'trump', 'military', 'obama']
-rps = [0.1,0.3,0.5,0.7,0.9,0.99]
+words = ['trump', 'military', 'clinton', 'war', 'obama']
+rps = [0.0, 0.5, 0.9, 0.999]
+betas = [10, 20, 40, 50, 200, 400, 600]
+
 
 for word in words:
     for rp in rps:
 
         topics = dict()
         for src, x in matf.items():
-            #model = gensim.models.Word2Vec.load(modelf[src])
-
-            with open(matf[src], 'rb') as f:
-                S = pickle.load(f)
-            S.shape
+            S = pd.read_hdf(matf[src], key='S')
 
             topics[src] = sa.centralized_randomwalk(word, matrix=S, returnprob=rp, max_iter=1000, verbose=False)
 
@@ -52,11 +50,13 @@ for word in words:
         G.add_nodes_from(list(topics.keys()))
         for srcA, topicA in topics.items():
             for srcB, topicB in topics.items():
-                betas = [5,8,10,15,20,30,40, 50, 60, 70, 100, 150, 200, 250, 400, 600]
-                bvals = {str(b):float(sa.topic_relatedness(topicA,topicB,alpha=10,beta=b)) for b in betas}
-                bvals['weight'] = bvals['10']
-                G.add_edge(srcA,srcB,bvals)
+                #bvals = { str(b):float(sa.topic_relatedness(topicA[1:],topicB[1:],alpha=scale,beta=b)) for b in betas}
+                r2, pval = sa.topic_correlation(topicA[1:],topicB[1:])
+                eweights = dict()
+                eweights['weight'] = float(r2)
+                eweights['pval'] = float(pval)
+                G.add_edge(srcA,srcB,eweights)
         
-        fname = folder+'{}-{}.gexf'.format(word,int(100*rp))
+        fname = folder+'{}-{}.gexf'.format(word,int(1000*rp))
         print(fname)
         nx.write_gexf(G,fname)
