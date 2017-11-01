@@ -35,7 +35,7 @@ def get_source_data(fname,verbose=False):
 if __name__ == "__main__":
 
     # script params
-    results_folder = 'results/wtvmodels/'
+    results_folder = 'results/wtvmodels_common/'
     num_dim = 100
     specialchars = ["'",'"',',','.','&']
 
@@ -72,6 +72,11 @@ if __name__ == "__main__":
 
         # remove stopwords
         src_par = [[w for w in par if w not in stopwords and w.isalnum()] for par in src_par]
+        
+        # keep only usenodes
+        with open('results/usenodes.pic', 'rb') as f:
+            usenodes = pickle.load(f)
+        src_par = [[w for w in par if w in usenodes] for par in src_par]
 
         # train model on all sentences from source
         print('{} sentences for {}.'.format(len(src_par), srcname))
