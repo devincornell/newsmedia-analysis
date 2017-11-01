@@ -30,7 +30,7 @@ def getfilenames(folder, file_extension):
 
 
 scale = 10
-matf = getfilenames('results/mat_common/','.mat')
+matf = getfilenames('results/mat_common/','.hdf')
 folder = 'results/srcnets/'
 words = ['trump', 'military']
 rps = [0, 0.8, 0.999]
@@ -42,9 +42,7 @@ for word in words:
 
         topics = dict()
         for src, x in matf.items():
-            #S = pd.read_hdf(matf[src], key='S')
-            with open(matf[src], 'rb') as f:
-                S = pickle.load(f)
+            S = pd.read_hdf(matf[src], key='S')
 
             topics[src] = sa.centralized_randomwalk(word, matrix=S, returnprob=rp, max_iter=10000, verbose=False)
 
