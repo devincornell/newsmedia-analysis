@@ -3,7 +3,7 @@ import string
 from IPython import display
 
 newdata = {}
-with open ('/Users/jacobfisher/PycharmProjects/newsmedia-analysis/Data/postprocessed_data.json', 'r') as infile:
+with open ('Data/postprocessed_data.json', 'r') as infile:
     for k,v in json.load(infile).items():
         newdata[k] = v
 
