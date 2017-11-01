@@ -22,3 +22,11 @@ Framing Perspectives
 
 
 This method from NS is useful for uncovering framing in multiple different ways. Rely on latent network structure of text.
+
+
+
+semantic
+word network
+
+source network (around a given target word)
+
