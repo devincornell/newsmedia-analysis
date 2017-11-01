@@ -33,8 +33,8 @@ if __name__ == "__main__":
 
     ## SETTINGS
     # file settings
-    models_folder = 'results/wtvmodels_big/'
-    matrix_folder = 'results/mat/'
+    models_folder = 'results/wtvmodels_common/'
+    matrix_folder = 'results/mat_common/'
     
     model_extension = '.wtvmodel'
 
@@ -45,6 +45,9 @@ if __name__ == "__main__":
 
     files = getfilenames(models_folder, model_extension)
     print('found {} files.'.format(len(files)))
+    
+    #with open('results/usenodes.pic', 'rb') as f:
+    #    usenodes = pickle.load(f)
 
     #files = {'cbsnews_pars':files['cbsnews_pars']}
     for src, fname in files.items():
