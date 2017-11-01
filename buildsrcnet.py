@@ -30,11 +30,11 @@ def getfilenames(folder, file_extension):
 
 
 scale = 10
-matf = getfilenames('results/mat_medium10/','.hdf')
+matf = getfilenames('results/mat_common/','.mat')
 folder = 'results/srcnets/'
-words = ['trump', 'military', 'clinton', 'war', 'obama']
-rps = [0.0, 0.5, 0.9, 0.999]
-betas = [10, 20, 40, 50, 200, 400, 600]
+words = ['trump', 'military']
+rps = [0, 0.8, 0.999]
+#betas = [10, 20, 40, 50, 200, 400, 600]
 
 
 for word in words:
@@ -42,9 +42,11 @@ for word in words:
 
         topics = dict()
         for src, x in matf.items():
-            S = pd.read_hdf(matf[src], key='S')
+            #S = pd.read_hdf(matf[src], key='S')
+            with open(matf[src], 'rb') as f:
+                S = pickle.load(f)
 
-            topics[src] = sa.centralized_randomwalk(word, matrix=S, returnprob=rp, max_iter=1000, verbose=False)
+            topics[src] = sa.centralized_randomwalk(word, matrix=S, returnprob=rp, max_iter=10000, verbose=False)
 
         G = nx.Graph()
         G.add_nodes_from(list(topics.keys()))
