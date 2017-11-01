@@ -50,13 +50,16 @@ for word in words:
         G.add_nodes_from(list(topics.keys()))
         for srcA, topicA in topics.items():
             for srcB, topicB in topics.items():
-                #bvals = { str(b):float(sa.topic_relatedness(topicA[1:],topicB[1:],alpha=scale,beta=b)) for b in betas}
                 r2, pval = sa.topic_correlation(topicA[1:],topicB[1:])
                 eweights = dict()
                 eweights['weight'] = float(r2)
                 eweights['pval'] = float(pval)
                 G.add_edge(srcA,srcB,eweights)
         
-        fname = folder+'{}-{}.gexf'.format(word,int(1000*rp))
+        f = '{}-{}'.format(word,int(1000*rp))
+        fname = folder + f + '.gexf'
         print(fname)
         nx.write_gexf(G,fname)
+        df = pd.DataFrame(nx.to_numpy_matrix(G), index=G.nodes(), columns=G.nodes())
+        df.to_csv('results/srcnets/'+f+'.csv')
+
