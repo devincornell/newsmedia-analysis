@@ -22,7 +22,7 @@ def remove_specialchars(paragraph,stopwords,specialchars):
 if __name__ == "__main__":
 
     # script params
-    NDIM = 100
+    NDIM = 5
     CORES = 44
     
     articles = Articles('results/articles.db')

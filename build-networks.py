@@ -30,41 +30,28 @@ def getfilenames(folder, model_extension):
 
 
 if __name__ == "__main__":
-
-    ## SETTINGS
-    # file settings
-    models_folder = 'results/wtvmodels_common/'
-    matrix_folder = 'results/mat_common/'
+    CORES = 10
     
-    model_extension = '.wtvmodel'
-
-    if len(sys.argv) > 1:
-        workers = int(sys.argv[1])
-    else:
-        workers = 10
-
-    files = getfilenames(models_folder, model_extension)
-    print('found {} files.'.format(len(files)))
     
-    #with open('results/usenodes.pic', 'rb') as f:
-    #    usenodes = pickle.load(f)
-
-    #files = {'cbsnews_pars':files['cbsnews_pars']}
-    for src, fname in files.items():
-        print(src)
-        model = gensim.models.Word2Vec.load(fname)
-        usenodes = list(model.wv.vocab.keys())
-        #usenodes = [w for w in model.wv.vocab.keys() if model.wv.vocab[w].count > 10]
-        print('using {} words for matrix.'.format(len(usenodes)))
+    with open('results/pos_models.pic', 'rb') as f:
+        models = pickle.load(f)
+        
+    m0 = list(models.keys())[0]
+    postags = set(models[m0].wv.vocab)
+    for src, model in models.items():
+        print(len(model.wv.vocab))
+        postags &= set(model.wv.vocab)
+    print('using', len(postags), 'nodes.')
+    
+    for src, model in models.items():
+        
+        print('building', src, 'matrix with', CORES, 'cores.')
         S = sa.build_semanticmatrix(model, usenodes, verbose=True, workers=workers)
         print('built matrix for', src)
-        print('now saving')
         
-        #with open(matrix_folder + src + '.mat', 'wb') as f:
-        #    pickle.dump(S, f)
-        S.to_hdf(matrix_folder+src+'.hdf', key='S')
-            
-        print(src, 'now done.')
+        print('now saving')
+        S.to_hdf('results/pos_networks.hdf', key=src)
+        print(src, 'complete.')
     
     print('ddfd')
     
