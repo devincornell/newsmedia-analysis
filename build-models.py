@@ -22,7 +22,7 @@ def remove_specialchars(paragraph,stopwords,specialchars):
 if __name__ == "__main__":
 
     # script params
-    NDIM = 5
+    NDIM = 3
     CORES = 44
     
     articles = Articles('results/articles.db')
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         nlp = spacy.load('en')
         #, batch_size=500, n_threads=-1)
         sents = list()
-        for doc in nlp.pipe(texts, disable=['ner','textcat'], n_threads=40):
+        for doc in nlp.pipe(texts, disable=['ner','textcat'], n_threads=CORES):
             for sent in doc.sents:
                 sents.append( [w.tag_ for w in sent] )
 
