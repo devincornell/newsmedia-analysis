@@ -22,7 +22,7 @@ def remove_specialchars(paragraph,stopwords,specialchars):
 if __name__ == "__main__":
 
     # script params
-    NDIM = 3
+    NDIM = 50
     CORES = 44
     
     articles = Articles('results/articles.db')
@@ -38,7 +38,8 @@ if __name__ == "__main__":
         sents = list()
         for doc in nlp.pipe(texts, disable=['ner','textcat'], n_threads=CORES):
             for sent in doc.sents:
-                sents.append( [w.tag_ for w in sent] )
+                sents.append( [w.text.lower() for w in sent if w.is_alpha] )
+        print(len(sents), 'sentences.')
 
         print('training wtv model')
         model = gensim.models.Word2Vec(sents, size=NDIM, workers=CORES, min_count=2, sg=1)
@@ -47,31 +48,7 @@ if __name__ == "__main__":
         print(models)
         
     print('saving file')
-    with open('results/pos_models.pic', 'wb') as f:
+    with open('results/word_models.pic', 'wb') as f:
         pickle.dump(models, f)
-    exit()
 
-    # remove special characters
-    #src_par = [[w for w in par if w not in punctlist] for par in src_par]
-
-    # convert to lower case
-    #src_par = [[w.lower() for w in par] for par in src_par]
-
-    # remove stopwords
-    #src_par = [[w for w in par if w not in stopwords and w.isalnum()] for par in src_par]
-
-    # keep only usenodes
-    with open('results/usenodes.pic', 'rb') as f:
-        usenodes = pickle.load(f)
-        src_par = [[w for w in par if w in usenodes] for par in src_par]
-
-        # train model on all sentences from source
-        print('{} sentences for {}.'.format(len(src_par), srcname))
-        print("Training model on {}".format(srcname))
-        model = gensim.models.Word2Vec(src_par, size=num_dim, workers=44, min_count=2, sg=1)
-        print('{} contains {} unique words.'.format(srcname,len(model.wv.vocab)))
-
-        # save model and word frequency count
-        print('Saving {}_pars.wtvmodel'.format(srcname))
-        model.save('{}{}_pars.wtvmodel'.format(results_folder,srcname))
-        print()
+        
